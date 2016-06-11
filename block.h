@@ -1,6 +1,6 @@
 #ifndef BLOCK_H
 #define BLOCK_H
-//test
+//test2222
 class CBlock:public CGameObject{
 	static const int BLOCK_WIDTH=28;
 	static const int FRAME_BOTTOM=480-11;
@@ -44,7 +44,7 @@ void CBlock::Update(){
 
 void CBlock::Create(int x,int y,int kind,double vx,double vy,CCreateInfo info){
 	CreateGameObject(x,y,kind,vx,vy);
-	mImgId=0;//ŒÅ’è
+	mImgId=0;//?Å’?
 	mBltX=mKind*BLOCK_WIDTH;
 	mBltY=0;
 	m_width=m_height=BLOCK_WIDTH;
