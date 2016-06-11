@@ -1,6 +1,6 @@
 #ifndef BLOCK_H
 #define BLOCK_H
-
+//test
 class CBlock:public CGameObject{
 	static const int BLOCK_WIDTH=28;
 	static const int FRAME_BOTTOM=480-11;
