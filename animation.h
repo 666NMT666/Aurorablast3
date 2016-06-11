@@ -1,6 +1,7 @@
 #pragma once
 #include "img32.h"
 class CAnimation {
+	//1111111
 protected:
 	CImage32* mImages;
 	unsigned int mNumFrames, mInterval;
