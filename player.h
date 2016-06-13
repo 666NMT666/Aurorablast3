@@ -26,6 +26,7 @@ private:
 	int mRendaCounter;
 	bool mCoughtFlg;
 	bool mKeepZFlg;
+	int mCaughtTimer;
 	int mBombCounter;
 	int mInvincibleCounter;
 	double mVerticalSpeed,mHorizontalSpeed;
@@ -80,6 +81,7 @@ public:
 		mWepon=0;
 		mBomb=2;;
 		mLife=2;
+		mCaughtTimer=0;
 		mKilledCounter=0; mInvincibleCounter=0; mBombCounter=0; mRendaCounter=0; 
 		mOptions=0; mShotTimer=0;
 		m_width=WIDTH;
@@ -137,6 +139,9 @@ public:
 		if(m_x>BATTLE_RIGHT-margin)m_x=BATTLE_RIGHT-margin;
 		if(m_y<BATTLE_TOP+margin)m_y=BATTLE_TOP+margin;
 		if(m_y>MOTION_RECT.bottom-margin)m_y=MOTION_RECT.bottom-margin;
+	}
+	void CatchPlayer(int t){
+		mCaughtTimer=t;
 	}
 	bool checkLevelUp(){
 		bool ret=mFlgLevelUp;
@@ -212,11 +217,12 @@ void CPlayer::Update(){
 	mVerticalSpeed=SPEED_SET[spd][VERTICAL];
 	mHorizontalSpeed=SPEED_SET[spd][HORIZONTAL];
 	
-	if (mCoughtFlg) {
+	if ( mCaughtTimer-- >0 ) {
 		mVerticalSpeed = 0;
 		mHorizontalSpeed = 0;
 	}
-
+	if(mCaughtTimer<0)mCaughtTimer=0;
+	
 	UpdateOption();
 
 	if(mInvincibleCounter>0){
