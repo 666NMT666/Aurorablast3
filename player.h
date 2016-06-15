@@ -77,10 +77,10 @@ public:
 		m_x=(BATTLE_RECT.left+BATTLE_RECT.right)/2; m_y=MOTION_RECT.bottom-30;
 		mExtendCounter=0;
 		mPowerUpCounter=0;
-		mPower=3;
+		mPower=4;
 		mWepon=0;
-		mBomb=2;;
-		mLife=2;
+		mBomb=3;
+		mLife=3;
 		mCaughtTimer=0;
 		mKilledCounter=0; mInvincibleCounter=0; mBombCounter=0; mRendaCounter=0; 
 		mOptions=0; mShotTimer=0;
@@ -203,6 +203,7 @@ void CPlayer::Update(){
 	UpdateGameObject();
 	
 	//CLine::drawGradationLine2(m_bg,(int)m_x-30,(int)m_y+5,400,mTimer,11,0xFFFFAA,0xFF5500,100,30,0,0);
+	mScore->AddScore(mScore->GetHaste());
 	mScore->AddHaste(-(mScore->GetHaste()>>7));
 	mShotTimer++;
 	Shot();
@@ -424,14 +425,12 @@ void CPlayer::ItemGet(int ext,int point){//現在ポイント（point）未使用
 
 	CBigInt bigInt(61+mScore->GetItems());
 	bigInt.Mul(mScore->GetHaste());
+	bigInt.Mul(mGameInfo->GetStage()/2+1);
 	bigInt.Mul(mGameInfo->getInnerRank()*mGameInfo->getInnerRank() *mGameInfo->getInnerRank()+1);
 	//bigInt.Mul((mGameInfo->GetLevel()+1)*(mGameInfo->GetLevel()+1));
-	int _life = mLife;
-	int _power = mPower;
-	if (_life == 0) {
-		_life = MAX_LIFE;
-		_power = MAX_POWER;
-	}
+	int _life = mLife + (MAX_LIFE - mLife) * mGameInfo->GetStage() / MAX_LIFE;
+	int _power = mPower + (MAX_POWER - mPower) * mGameInfo->GetStage() / MAX_POWER;
+
 	int sft = 13 *( _life + _power + mGameInfo->GetLevel()) / (7 + MAX_POWER + 5);
 	if (sft != 0) {
 		sft = rand() % sft;

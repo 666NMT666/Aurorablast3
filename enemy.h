@@ -252,7 +252,7 @@ void CEnemy::Create(int x,int y,int kind,double vx,double vy,const CCreateInfo& 
 	m_vx=vx; m_vy=vy;
 	m_width= data.width;
 	m_height= data.height;
-	mLife= data.life + mGameInfo->getInnerRank()/10;
+	mLife= data.life + mGameInfo->getInnerRank()/32;
 	mLife0=mLife;
 	mLandscapeFlg=false;
 	mMaxParts= data.front_parts;
