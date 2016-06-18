@@ -179,10 +179,6 @@ void CEnemyGenerator::GeneratorLiner1Shot(){
 	mInvincibleFlg=true;
 	if(mTimer%6==0){
 		CCreateInfo info;
-		if(kind==21){
-			if(m_y0<240)info.params[0]=90;
-			else info.params[0]=270;
-		}
 		if(m_y0>BATTLE_MIDDLE_Y)mEnemyManager->Create2((int)m_x,BATTLE_RECT.bottom,kind,0,-5,info);
 		else mEnemyManager->Create2((int)m_x,BATTLE_RECT.top,kind,0,5,info);
 	}

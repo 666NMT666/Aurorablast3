@@ -1,10 +1,13 @@
 class CEnemyTrailFormed2:public CEnemy{
 protected:
 	int mShotPhase;
+	int mType;
 public:
 	void CreateEnemy(){
+		mType = rand()%2;
 		mShotPhase=rand()%100;
 		mDisabledFlg=(rand()%(CGameInfo::NUM_LEVEL*2-mGameLevel)>0)?true:false; // 0‚æ‚è‘å‚«‚¯‚ê‚ÎŒ‚‚½‚È‚¢
+		mBltY = mType * m_height;
 	}
 	void UpdateEnemy();
 	void Killed();
@@ -12,7 +15,8 @@ public:
 
 void CEnemyTrailFormed2::UpdateEnemy(){
 	m_vy=6;
-	m_vx=sin(N_PI*4*mTimer);
+	if (mType)m_vx = sin(N_PI * 4 * mTimer);
+	else m_vx = sin(-N_PI * 4 * mTimer);
 	DirectWithVel();
 	if(m_y>320+mGameLevel*100){}
 	else if((mTimer+mShotPhase)%(60+(CGameInfo::NUM_LEVEL-mGameLevel)*10)==0 && mDisabledFlg==false){

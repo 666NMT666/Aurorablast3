@@ -55,8 +55,8 @@ void CEnemyFO04::UpdateEnemy(){
 		mEMManager->Create<CEnemyMissile>((int)m_x,(int)m_y,1,0,(vel-4)*cos(N_PI*a),(vel-4)*sin(N_PI*a),info);
 	}
 	BackLightMedium();
-	CLine::drawFadeLine2(m_bg,(int)m_x+30,(int)m_y+28,lineLength   ,-90,8,0xFFDDFF,0,BATTLE_RECT);
-	CLine::drawFadeLine2(m_bg,(int)m_x-30,(int)m_y+28,lineLength-10,-90,6,0xFFDDFF,0,BATTLE_RECT);
+	CLine::drawFadeLine2(m_bg,(int)m_x+30,(int)m_y+28,lineLength   ,90,8,0xFFDDFF,0,BATTLE_RECT);
+	CLine::drawFadeLine2(m_bg,(int)m_x-30,(int)m_y+28,lineLength-10,90,6,0xFFDDFF,0,BATTLE_RECT);
 }
 void CEnemyFO04::Killed(){
 	if(mKilledTimer==0) mSE->PlaySingleSound(mKilledSound);

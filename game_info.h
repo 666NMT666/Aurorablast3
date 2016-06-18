@@ -1,6 +1,6 @@
 #pragma once
 
-const int GAME_START_STAGE = 0;
+const int GAME_START_STAGE = 5;
 const int MAX_STAGES = 7;
 const int MAX_STAGE_TRIAL = 6;
 

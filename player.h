@@ -237,8 +237,8 @@ void CPlayer::Update(){
 		mBltInfo.type=BLT_WHITEN;
 		mBltInfo.alpha=120;
 		int length=3*120*mInvincibleCounter/MAX_INVINCIBLE_COUNTER;
-		CLine::drawFadeLine2(m_bg,(int)m_x-10,(int)m_y,length,-90,6,0xAAFFFF,0,BATTLE_RECT);
-		CLine::drawFadeLine2(m_bg,(int)m_x+10,(int)m_y,length,-90,6,0xAAFFFF,0,BATTLE_RECT);
+		CLine::drawFadeLine2(m_bg,(int)m_x-10,(int)m_y,length, 90,6,0xAAFFFF,0,BATTLE_RECT);
+		CLine::drawFadeLine2(m_bg,(int)m_x+10,(int)m_y,length, 90,6,0xAAFFFF,0,BATTLE_RECT);
 	}else {
 		mBltInfo.type=BLT_KEY;
 	}
@@ -377,7 +377,7 @@ void CPlayer::UpdateOption(){
 			CVector from(m_x,m_y);
 			mOption[i].SetPos(ExMath::asymptote(from,to,mOption[i].GetTimer()/4));
 			int length=3*120*mInvincibleCounter/MAX_INVINCIBLE_COUNTER;
-			CLine::drawFadeLine2(m_bg,mOption[i].GetX()+11,mOption[i].GetY()+6,length,-90,6,0xAAFFFF,0,BATTLE_RECT);
+			CLine::drawFadeLine2(m_bg,mOption[i].GetX()+11,mOption[i].GetY()+6,length,90,6,0xAAFFFF,0,BATTLE_RECT);
 			mOption[i].Update();
 		}
 	}else{
@@ -388,7 +388,7 @@ void CPlayer::UpdateOption(){
 			CVector from(m_x,m_y);
 			mOption[i].SetPos(ExMath::asymptote(from,to,mOption[i].GetTimer()/4));
 			int length=3*120*mInvincibleCounter/MAX_INVINCIBLE_COUNTER;
-			CLine::drawFadeLine2(m_bg,mOption[i].GetX()+6,mOption[i].GetY()+5,length,-90,6,0xAAFFFF,0,BATTLE_RECT);
+			CLine::drawFadeLine2(m_bg,mOption[i].GetX()+6,mOption[i].GetY()+5,length,90,6,0xAAFFFF,0,BATTLE_RECT);
 			mOption[i].Update();
 		}
 	}
