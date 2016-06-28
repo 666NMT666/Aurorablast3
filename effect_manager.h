@@ -51,11 +51,11 @@ public:
 	}
 	void CreateEclipsedCircle(int x1, int y1, int r1, int x2, int y2, int r2, DWORD color);
 	void CreateEclipsedElipse(int x1, int y1, int rx1, int ry1, int x2, int y2, int rx2, int ry2, DWORD color);
+	void CreateLine(int x1, int y1, int x2, int y2, DWORD color);
+	void CreateLineWithAngle(int x1, int y1, int x2, int y2, DWORD color);
 	void CreateThrash(int x, int y, int w, int h, int angle, DWORD color);
 	void CreateEffect(int x, int y, TEffectFile kind, int subKind, double vx, double vy, int motion, int interval, int end, int delta);
 	void DrawEffect(CImageDIB* dest, int x, int y, int kind, int subKind, TBltType type, int alpha);
-
-
 	void ExplosionSample(int x, int y);
 };
 CEffectManager* CEffectManager::instance = new CEffectManager();
@@ -119,6 +119,22 @@ void CEffectManager::CreateThrash(int x, int y, int w, int h, int angle, DWORD c
 	CBltInfo bi;
 	CCreateInfo info(0, 0, 0, 0, 0, bi);
 	obj->Create(x, y, w, h, angle, color);
+	mObjectList.push_back(obj);
+}
+
+void CEffectManager::CreateLine(int x1, int y1, int x2, int y2, DWORD color) {
+	CEffectLine* obj = new CEffectLine();
+	CBltInfo bi;
+	CCreateInfo info(0, 0, 0, 0, 0, bi);
+	obj->Create(x1, y1, x2, y2, color);
+	mObjectList.push_back(obj);
+}
+
+void CEffectManager::CreateLineWithAngle(int x1, int y1, int length, int angle, DWORD color) {
+	CEffectLine* obj = new CEffectLine();
+	CBltInfo bi;
+	CCreateInfo info(0, 0, 0, 0, 0, bi);
+	obj->CreateWithAngle(x1, y1, length, angle , color);
 	mObjectList.push_back(obj);
 }
 

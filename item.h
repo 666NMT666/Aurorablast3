@@ -105,6 +105,8 @@ void CItem::itemExtendChip4(){
 
 void CItem::itemBomb(){
 	BackLightSmall();
+	int freq = 10;
+	mFrontEffectManager->CreateEclipsedCircle(m_x, m_y, 50*sin(N_PI*(mTimer*44))+10, m_x, m_y, 50 * sin(N_PI*(mTimer * 44)) + 8, 0xFFFFFFFF);
 	if(m_x<=BATTLE_LEFT || m_x>=BATTLE_RIGHT){ m_vx *= -1; }
 	if (m_y <= BATTLE_TOP || m_y >= BATTLE_BOTTOM) { m_vy *= -1; }
 	if(HitRadius(120)==true){

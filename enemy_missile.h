@@ -9,8 +9,9 @@ enum TMissileMotion{
 	EMISSILE_DEPTHCHARGE,
 	EMISSILE_SPINNING_DEPTHCHARGE,
 	EMISSILE_DEPTHCHARGE_Y,
+	KILLERSHOT_GRAVITY,
 };
-enum TMissileFile{
+enum TMissileFile {
 	EB_MISSILE_48x14,
 	EB_MISSILE_100x20,
 	EB_KILLERSHOT_160x160,
@@ -18,6 +19,7 @@ enum TMissileFile{
 	EB_DEPTHCHARGE_32x20,
 	EB_DEPTHCHARGE_48x30,
 	EB_DEPTHCHARGE_60x30,
+	KS_GRAVITY_100,
 
 	EMISSILE_FILES,
 };
@@ -33,7 +35,8 @@ const TEMissileFileData EMISSILE_FILE[EMISSILE_FILES]={
 	{"dat/img/eb/em-mine30_30.bmp",30,30,4,BLT_KEY},
 	{"dat/img/eb/em-depthcharge32x20.bmp",32,20,4,BLT_KEY},
 	{"dat/img/eb/em-depthcharge48x30.bmp",48,30,4,BLT_KEY},
-	{"dat/img/eb/em-depthcharge60x30.bmp",60,30,1,BLT_KEY},
+	{ "dat/img/eb/em-depthcharge60x30.bmp",60,30,1,BLT_KEY },
+	{ "dat/img/eb/eb-killershot100.bmp",100,100,1,BLT_KEY },
 };
 
 class CEnemyMissile:public CEnemySideObject{

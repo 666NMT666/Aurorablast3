@@ -78,6 +78,7 @@ void CEnemyMidboss4::Killed(){
 			double vy=-v*sin(N_PI*18*i)-20;
 			mEffectManager->CreateEffect((int)m_x,(int)m_y+m_height/2,EFFECT_EXPLOSION_90,0,vx,vy,0,3,0,0);
 		}
+		mItemManager->CreateItem(m_x, m_y, 4, 0, 4, 4);
 	}
 	int pointMul=500-mTimer;
 	if(pointMul<0)pointMul=0;
