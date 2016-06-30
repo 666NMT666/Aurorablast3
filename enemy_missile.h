@@ -60,6 +60,7 @@ private:
 	void Depthcharge();
 	void SpiningDepthcharge();
 	void DepthchargeY();
+	void Gravity();
 public:
 	CEnemyMissile():CEnemySideObject(),mLife(0),mLethalFlg(false){
 		mMotionKind=0;
@@ -93,7 +94,8 @@ void CEnemyMissile::Update(){
 		case EMISSILE_DEPTHCHARGE: Depthcharge(); break;
 		case EMISSILE_SPINNING_DEPTHCHARGE: SpiningDepthcharge();  break;
 		case EMISSILE_DEPTHCHARGE_Y: DepthchargeY(); break; 
-		default: break;
+		case KILLERSHOT_GRAVITY: Gravity(); break;
+default: break;
 	}
 
 	if(mLethalFlg){
@@ -376,5 +378,25 @@ void CEnemyMissile::DepthchargeY() { //
 		int gas_interval = 1;
 		if (mTimer%gas_interval == 0)
 			mEffectManager->CreateEffect((int)m_x, (int)m_y - m_height / 2 + 5, EFFECT_EXPLOSION_40, 0, 0, -5.0 - 0.1*(rand() % 90), 0, 2, 0, 0);
+	}
+}
+
+void CEnemyMissile::Gravity() { //
+	mAutoDelFlg = true;
+	mLethalFlg = false;
+	mBltInfo.angle = mParams[4]*mTimer; // angle
+	double fc=1.0;
+	double dy=m_y - mPlayer->GetY() ;
+	double dx=m_x - mPlayer->GetX() ;
+	double d2=dx*dx + dy*dy;
+	if (d2<m_width*m_width /4) {
+        d2=m_width*m_width /4;
+    }
+    CVector v=CVector::TargetVector(m_x,m_y,mPlayer->GetX() ,mPlayer->GetY(),fc/d2);
+    mPlayer->ForcePlayer(v.x,v.y);
+    
+    
+	if ( mTimer > 100) {
+        mDelFlg = true;
 	}
 }
