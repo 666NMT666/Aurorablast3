@@ -131,6 +131,7 @@ public:
 	const int GetPower(){return mPower;}
 	const int GetWepon(){return mWepon;}
 	const int GetBomb(){return mBomb;}
+
 	void ForcePlayer(int x, int y) {
 		m_x += x;
 		m_y += y;
@@ -143,10 +144,10 @@ public:
 	void ForcePlayer(double x, double y, double margin = 0) {
 		m_x += x;
 		m_y += y;
-		if (m_x<BATTLE_LEFT + margin)m_x = BATTLE_LEFT + margin;
-		if (m_x>BATTLE_RIGHT - margin)m_x = BATTLE_RIGHT - margin;
-		if (m_y<BATTLE_TOP + margin)m_y = BATTLE_TOP + margin;
-		if (m_y>MOTION_RECT.bottom - margin)m_y = MOTION_RECT.bottom - margin;
+		if (m_x < BATTLE_LEFT + margin)m_x = BATTLE_LEFT + margin;
+		if (m_x > BATTLE_RIGHT - margin)m_x = BATTLE_RIGHT - margin;
+		if (m_y < BATTLE_TOP + margin)m_y = BATTLE_TOP + margin;
+		if (m_y > MOTION_RECT.bottom - margin)m_y = MOTION_RECT.bottom - margin;
 	}
 	void CatchPlayer(int t){
 		mCaughtTimer=t;
