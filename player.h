@@ -131,10 +131,17 @@ public:
 	const int GetPower(){return mPower;}
 	const int GetWepon(){return mWepon;}
 	const int GetBomb(){return mBomb;}
-	void ForcePlayer(int x,int y){
+	void ForcePlayer(int x,int y,int margin=30){
 		m_x+=x;
 		m_y+=y;
-		const int margin=30;
+		if(m_x<BATTLE_LEFT+margin)m_x=BATTLE_LEFT+margin;
+		if(m_x>BATTLE_RIGHT-margin)m_x=BATTLE_RIGHT-margin;
+		if(m_y<BATTLE_TOP+margin)m_y=BATTLE_TOP+margin;
+		if(m_y>MOTION_RECT.bottom-margin)m_y=MOTION_RECT.bottom-margin;
+	}
+	void ForcePlayer(double x,double y,int margin=30){
+		m_x+=x;
+		m_y+=y;
 		if(m_x<BATTLE_LEFT+margin)m_x=BATTLE_LEFT+margin;
 		if(m_x>BATTLE_RIGHT-margin)m_x=BATTLE_RIGHT-margin;
 		if(m_y<BATTLE_TOP+margin)m_y=BATTLE_TOP+margin;
