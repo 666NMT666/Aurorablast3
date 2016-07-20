@@ -1,16 +1,30 @@
 const int BOSS_PARTS_FILES=10;
 const int BOSS_MAIN_FILES=4;
-const int BOSS1_1=0;
-const int BOSS_FILES=10;
+
+enum TBossFile {
+	BOSS1_1,
+	BOSS2_1,
+	BOSS3_1,
+	BOSS4_1,
+	BOSS5_1,
+	BOSS6_1,
+	BOSS7_1,
+	BOSS3_2,
+	BOSS6_2,
+	BOSS7_2,
+	BOSS_FILES,
+};
 const TEnemyFileData BOSS_FILE[BOSS_FILES]={
-	{"dat/img/boss/boss1/boss1.bmp",195,94,5,8},
-	{"dat/img/boss/boss2/boss2.bmp",521,466,7,0},
-	{"dat/img/boss/boss3/boss3.bmp",680,610,22,0},
-	{"dat/img/boss/boss4/boss4.bmp",216,128,0,2},
-	{"dat/img/boss/boss5/boss5.bmp",540,443,3,0},
-	{"dat/img/boss/boss6/boss6.bmp",844,602,3,1},
-	{"dat/img/boss/boss7/boss7.bmp",293,293,0,2},
-	{"dat/img/dummy.bmp",225,225,1,0},
+	{ "dat/img/boss/boss1/boss1.bmp",195,94,5,8 },
+	{ "dat/img/boss/boss2/boss2.bmp",521,466,7,0 },
+	{ "dat/img/boss/boss3/boss3.bmp",680,610,22,0 },
+	{ "dat/img/boss/boss4/boss4.bmp",216,128,0,2 },
+	{ "dat/img/boss/boss5/boss5.bmp",540,443,3,0 },
+	{ "dat/img/boss/boss6/boss6.bmp",844,602,3,1 },
+	{ "dat/img/boss/boss7/boss7.bmp",293,293,0,2 },
+	{ "dat/img/boss/boss3/boss3-2.bmp",197,20,0,0 },
+	{ "dat/img/boss/boss6/boss6-2.bmp",293,293,0,0 },
+	{ "dat/img/boss/boss7/boss7-2.bmp",293,293,0,0 },
 };
 
 class CBoss:public CEnemy{
@@ -36,6 +50,11 @@ public:
 	void UpdateBoss();
 	void CreateBoss();
 	virtual void Transform(){}
+	void SetImg(int k) {
+		mImgId = k;
+		m_width = BOSS_FILE[k].width;
+		m_height = BOSS_FILE[k].height;
+	}
 };
 
 void CBoss::CreateBoss() {
@@ -133,6 +152,12 @@ void CBoss::_UpdateAfterDeath(){
 			double vy=-v*sin(N_PI*18*i)-20;
 			mEffectManager->CreateEffect(m_x,m_y+m_height/2, EFFECT_EXPLOSION_90,0,vx,vy,0,3,0,0);
 		}
+	}
+
+	if (mDeadTimer == 20) {
+		mEnemyManager->DestroyAllEnemy();
+		mEBManager->KillAllBullet();
+		mEMManager->Reset();
 	}
 	if(mDeadTimer>60)mBltInfo.type=BLT_NULL;
 	if(mDeadTimer>200)mDelFlg=true;

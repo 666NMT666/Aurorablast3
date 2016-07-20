@@ -10,6 +10,9 @@ enum TMissileMotion{
 	EMISSILE_SPINNING_DEPTHCHARGE,
 	EMISSILE_DEPTHCHARGE_Y,
 	KILLERSHOT_GRAVITY,
+	EMISSILE_GRAVITY_MINE,
+
+	EMISSILE_MOTIONS,
 };
 enum TMissileFile {
 	EB_MISSILE_48x14,
@@ -61,6 +64,8 @@ private:
 	void SpiningDepthcharge();
 	void DepthchargeY();
 	void Gravity();
+	void GravityMine();
+
 public:
 	CEnemyMissile():CEnemySideObject(),mLife(0),mLethalFlg(false){
 		mMotionKind=0;
@@ -95,7 +100,8 @@ void CEnemyMissile::Update(){
 		case EMISSILE_SPINNING_DEPTHCHARGE: SpiningDepthcharge();  break;
 		case EMISSILE_DEPTHCHARGE_Y: DepthchargeY(); break; 
 		case KILLERSHOT_GRAVITY: Gravity(); break;
-default: break;
+		case EMISSILE_GRAVITY_MINE: GravityMine(); break;
+		default: break;
 	}
 
 	if(mLethalFlg){
@@ -127,7 +133,7 @@ void CEnemyMissile::Create(int x,int y,int kind,int img_sub_kind,double vx,doubl
 	mNumCycle=EMISSILE_FILE[kind].numCycle;
 	mMotionKind=mParams[0];
 	int lv=(mGameInfo->GetLevel()+2)/3;
-	const int MISSILE_LIFE[10]={5+lv,4+lv,5+lv,5+lv,5+lv,5+lv,5+lv,5+lv,4+lv,5};
+	const int MISSILE_LIFE[EMISSILE_MOTIONS]={5+lv,4+lv,5+lv,5+lv,5+lv,5+lv,5+lv,4+lv,4+lv,5,100,10};
 	mLife=MISSILE_LIFE[mMotionKind];
 }
 
@@ -138,7 +144,7 @@ void CEnemyMissile::StopAndGo(){ //SPIN_GO
 	int abs_dy=abs((int)m_y-mPlayer->GetY());
 	if(mTimer<mParams[1]){
 		mLethalFlg=false;
-		if (mGameInfo->GetStage() == 3)mLife += 1;
+		//if (mGameInfo->GetStage() == 3)mLife += 1;
 		mBltInfo.angle=(mBltInfo.angle+47)%360;
 		ForceFriction(0.82, 0.82);
 	}else if((mTimer<mParams[1]+2 || mCounter!=1) && mTimer<mParams[1]+30){
@@ -381,22 +387,50 @@ void CEnemyMissile::DepthchargeY() { //
 	}
 }
 
-void CEnemyMissile::Gravity() { //
+void CEnemyMissile::Gravity() {
 	mAutoDelFlg = true;
-	mLethalFlg = false;
-	mBltInfo.angle = mParams[4]*mTimer; // angle
-	double fc=1.0;
+	mLethalFlg = true;
+	double fc = mParams[2];
 	double dy=m_y - mPlayer->GetY() ;
 	double dx=m_x - mPlayer->GetX() ;
 	double d2=dx*dx + dy*dy;
 	if (d2<m_width*m_width /4) {
         d2=m_width*m_width /4;
     }
-    CVector v=CVector::TargetVector(m_x,m_y,mPlayer->GetX() ,mPlayer->GetY(),fc/d2);
-    mPlayer->ForcePlayer(v.x,v.y);
-    
-    
+	CVector v = CVector::TargetVector(m_x, m_y, mPlayer->GetX(), mPlayer->GetY(), fc / d2);
+	mPlayer->ForcePlayer(-v.x, -v.y);
+	mBltInfo.zoom = mTimer*0.05 < 1.0 ? mTimer*0.05 : 1.0;
 	if ( mTimer > 100) {
-        mDelFlg = true;
+		mDelFlg = true;
+	}
+}
+
+void CEnemyMissile::GravityMine() {
+	mAutoDelFlg = true;
+	mLethalFlg = true;
+
+	
+	mBltInfo.angle += mParams[1];//omega
+	RECT rc = { (int)m_x - m_width / 2,(int)m_y - m_height / 2,(int)m_x + m_width / 2,(int)m_y + m_height / 2 };
+	if (mBulletManager->HitTestRect(rc)) {// life
+		--mLife;
+	}
+	if (--mLife <= 0) {
+		mLife = 50;
+		mImgId = KS_GRAVITY_100;
+		mMotionKind = KILLERSHOT_GRAVITY;
+
+		mBltY = EMISSILE_FILE[mImgId].height*(mMotionKind + EMISSILE_FILE[mImgId].numCycle - 1);
+		m_width = EMISSILE_FILE[mImgId].width;
+		m_height = EMISSILE_FILE[mImgId].height;
+		mNumCycle = EMISSILE_FILE[mImgId].numCycle;
+		mParams[2] = 70000;
+		mSE->PlaySingleSound(SE_EXP1);
+		for (int i = 0; i<5; i++)mEffectManager->CreateEffect((int)m_x, (int)m_y, EFFECT_EXPLOSION_40, 0, 2 * sin(N_PI*(rand() % 60) - 30), 6 + i, 0, 2, 0, 0);
+	}
+	if (m_vy*m_vy + m_vx*m_vx>10.0) { ForceFriction(0.8, 0.8); }
+	else if (mTimer<50) {}
+	else if (mTimer % 6 == 0) {
+		mLife--;
 	}
 }

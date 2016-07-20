@@ -14,38 +14,54 @@ private:
 	CGameInfo *mGameInfo;
 	CTextView* mTextViewDlgTitle;
 	CTextView* mTextViewDlgChoice;
+	CTextView* mTextViewDlgTitle2;
+	CTextView* mTextViewDlgChoice2;
 	CTextView* mTextViewDlgNum;
 	int m_position;
 	int m_nextPage;
-	bool mDlgFlg, mConfigDlgFlg, mSelectDlgFlg;;
+	bool mDlgFlg, mConfigDlgFlg;
+	bool mSelectStoryModeFlg;
 	int mKeyShot,mKeyBomb,mKeyChange,mKeyPause;
-	int mPosDlg;
+	int mPosDlg, mPosDlg2;
 	bool mDlgInitFlg;
 public:
 	CTitleViewController():CViewController(){
 		m_position=0;
 		m_nextPage=0;
-		mPosDlg=0;
+		mPosDlg = mPosDlg2 =0;
 		mDlgInitFlg=false;
-		mDlgFlg = mConfigDlgFlg = mSelectDlgFlg = false;
+		mDlgFlg = mConfigDlgFlg = mSelectStoryModeFlg = false;
 		m_image_bg.load("dat/img/title.bmp");
 		mImgCursor.load("dat/img/csl.bmp");
 		mGameInfo=CGameInfo::GetInstance();
 
 
 		RECT rc={320,170,350+300,170+60};
-		mTextViewDlgTitle=new CTextView(bg->hDC(),rc,50,0xFFFFFF,"-Level Select-");
+		mTextViewDlgTitle=new CTextView(bg->hDC(),rc,50,0x88FFFF,"-Level Select-");
 		mTextViewDlgChoice=new CTextView[5];
 		for(int i=0;i<5;i++){
 			static char str[5][16]={"Easy","Normal","Hard","Morbid","Suicidal"};
-			RECT rc={350,260+55*i,350+300,260+55*i+50};
-			mTextViewDlgChoice[i].InitTextView(bg->hDC(),rc,50,0xFFFFFF,str[i]);
+			RECT rc={350,260+50*i,350+300,260+50*i+50};
+			mTextViewDlgChoice[i].InitTextView(bg->hDC(),rc,40,0xFFFFFF,str[i]);
 		}
+
+
+		RECT rc2 = { 320,260+50*5, 350 + 300,260 + 50 * 6 };
+		mTextViewDlgTitle2 = new CTextView(bg->hDC(), rc2, 50, 0x88FFFF, "-Story Mode-");
+		mTextViewDlgChoice2 = new CTextView[2];
+		for (int i = 0; i<2; i++) {
+			static char str[2][16] = { "OFF","ON"};
+			RECT rc = { 350,510 + 50 * i,350 + 300,510 + 50 * i + 50 };
+			mTextViewDlgChoice2[i].InitTextView(bg->hDC(), rc, 40, 0xFFFFFF, str[i]);
+		}
+
+
 		mTextViewDlgNum=new CTextView[4];
 		for(int i=0;i<4;i++){
 			RECT rc={550,260+55*i,550+100,260+55*i+50};
 			mTextViewDlgNum[i].InitTextView(bg->hDC(),rc,50,0xFF99FF,"00");
 		}
+
 		mPad->LoadConfig();
 		mPad->GetKeyConfig(mKeyShot,mKeyBomb,mKeyChange,mKeyPause);
 	}
@@ -61,13 +77,24 @@ public:
 };
 
 void CTitleViewController::setDlgTextColor(){
-	for(int i=0;i<5;i++){
-		if(i==mPosDlg){
+	for (int i = 0; i<5; i++) {
+		if (i == mPosDlg) {
 			mTextViewDlgChoice[i].SetColor(0xCCFFFF);
 			mTextViewDlgChoice[i].SetItaric(false);
-		}else{
+		}
+		else {
 			mTextViewDlgChoice[i].SetColor(0x885555);
 			mTextViewDlgChoice[i].SetItaric(true);
+		}
+	}
+	for (int i = 0; i<2; i++) {
+		if (i == mPosDlg2 && mSelectStoryModeFlg) {
+			mTextViewDlgChoice2[i].SetColor(0xCCFFFF);
+			mTextViewDlgChoice2[i].SetItaric(false);
+		}
+		else {
+			mTextViewDlgChoice2[i].SetColor(0x885555);
+			mTextViewDlgChoice2[i].SetItaric(true);
 		}
 	}
 }
@@ -75,11 +102,11 @@ void CTitleViewController::setDlgTextColor(){
 void CTitleViewController::onKeyDownX(){
 	if (mDlgFlg) {
 		mDlgFlg = false;
-		mSelectDlgFlg = false;
+		mSelectStoryModeFlg = false;
 	}
-	else if (mSelectDlgFlg) {
+	else if (mSelectStoryModeFlg) {
 		mDlgFlg = true;
-		mSelectDlgFlg = false;
+		mSelectStoryModeFlg = false;
 	}
 	mDlgInitFlg=false;
 }
@@ -88,28 +115,28 @@ void CTitleViewController::onKeyDownZ(){
 	if(m_timer<20)return;// 前ページのボタン押下が残っているので回避
 
 	if(mDlgFlg){
-		m_nextPage=ENDURANCE_VIEW_CONTROLLER;    //////////////
-		mGameInfo->SetLevel(mPosDlg);
-		mSE->PlaySingleSound(SE_KEY2);
-		mDlgInitFlg=false;
-		mDlgFlg = false;
-		mPosDlg = 0;
-		//mSelectDlgFlg = true;  //////////////////
-		return;
-	} else if (mSelectDlgFlg) {
-		m_nextPage = ENDURANCE_VIEW_CONTROLLER;    //////////////
+		if (!mSelectStoryModeFlg) {
+			mSelectStoryModeFlg = true;
+			mGameInfo->SetLevel(mPosDlg);
+		} else {
+			mSelectStoryModeFlg = false;
+			mDlgFlg = false;
+			mDlgInitFlg = false;
+			m_nextPage = ENDURANCE_VIEW_CONTROLLER;    //////////////
+			mGameInfo->SetStoryMode(mPosDlg2);
+			mPosDlg = 0;
+			mPosDlg2 = 0;
+		}
 		
-		mGameInfo->SetStoryMode(mPosDlg);
-		
 		mSE->PlaySingleSound(SE_KEY2);
-		mDlgInitFlg = false;
 		return;
-	}else if(mConfigDlgFlg){
+	} else if(mConfigDlgFlg){
 		if(mPosDlg==4){
 			mSE->PlaySingleSound(SE_KEY2);
 			mPad->SaveConfig();
 			mConfigDlgFlg=false;
 			mDlgInitFlg=false;
+			mPosDlg = 0;
 		}
 		return;
 	}
@@ -117,6 +144,7 @@ void CTitleViewController::onKeyDownZ(){
 	if(m_position==0){
 		mDlgFlg=true;
 		mPosDlg=0;
+		mPosDlg2 = 0;
 	}else if(m_position==1){
 		mConfigDlgFlg=true;
 		mPosDlg=0;
@@ -131,19 +159,21 @@ void CTitleViewController::onKeyDownDown(){
 	//test.save("ttetetet.bmp");
 	mSE->PlaySingleSound(SE_KEY1);
 	if(mDlgFlg){
-		mPosDlg++;
-		if(mPosDlg>4)mPosDlg=4;
-		setDlgTextColor();
-	}else if (mSelectDlgFlg) {
-		mPosDlg++;
-		if (mPosDlg>1)mPosDlg = 1;
+		if (!mSelectStoryModeFlg) {
+			mPosDlg++;
+			if (mPosDlg>4)mPosDlg = 4;
+		}
+		else {
+			mPosDlg2++;
+			if (mPosDlg2>1)mPosDlg2 = 1;
+		}
 		setDlgTextColor();
 	}
 	else if(mConfigDlgFlg){
 		mPosDlg++;
 		if(mPosDlg>4)mPosDlg=4;
 		setDlgTextColor();
-	}else{
+	} else {
 		m_position++;
 		if(m_position>3)m_position=3;
 		setDlgTextColor();
@@ -151,9 +181,12 @@ void CTitleViewController::onKeyDownDown(){
 }
 void CTitleViewController::onKeyDownUp(){
 	mSE->PlaySingleSound(SE_KEY1);
-	if (mDlgFlg || mConfigDlgFlg || mSelectDlgFlg) {
-		mPosDlg--;
+	if (mDlgFlg || mConfigDlgFlg) {
+		if (!mSelectStoryModeFlg) mPosDlg--;
+		else mPosDlg2--;
+
 		if (mPosDlg<0)mPosDlg = 0;
+		if (mPosDlg2<0)mPosDlg2 = 0;
 		setDlgTextColor();
 	}else{
 		m_position--;
@@ -164,7 +197,7 @@ void CTitleViewController::onKeyDownUp(){
 int CTitleViewController::onTimer(){
 	onTimerSuper();
 	
-	if(m_nextPage==ENDURANCE_VIEW_CONTROLLER){ mDlgFlg = mSelectDlgFlg = false;return ENDURANCE_VIEW_CONTROLLER;}
+	if(m_nextPage==ENDURANCE_VIEW_CONTROLLER){ mDlgFlg = mSelectStoryModeFlg = false;return ENDURANCE_VIEW_CONTROLLER;}
 	else if(m_nextPage==CONFIG_VIEW_CONTROLLER){mConfigDlgFlg=false; return CONFIG_VIEW_CONTROLLER;}
 	else if(m_nextPage==REPLAY_VIEW_CONTROLLER)return REPLAY_VIEW_CONTROLLER;
 	else if(m_nextPage==NAME_ENTRY_VIEW_CONTROLLER)return NAME_ENTRY_VIEW_CONTROLLER;
@@ -173,44 +206,39 @@ int CTitleViewController::onTimer(){
 		CBltInfo bi_blacken(BLT_BLACKEN,100);
 		CImageBlender::Blt(bg,&m_image_bg,&bi_blacken,WND_RECT,0,0);
 		CShapeBlender::fillRect(bg,334,440,633,719,0x000000);
-		showDialog();
+		int dlg_margin = 110;
+		int margin = 10;
+		int line_height_h = 50;
+		int line_height_li = 40;
+		showDialog(dlg_margin);
 		if(mDlgInitFlg==false){
-			RECT rc = { 320,170,350 + 300,170 + 60 };
+			RECT rc = { 320,dlg_margin + margin,350 + 300,dlg_margin + margin + line_height_h };
 			mTextViewDlgTitle->SetRect(rc);
 			mTextViewDlgTitle->SetText("-Level Select-");
 			for(int i=0;i<5;i++){
 				static char str[5][16]={"Easy","Normal","Hard","Morbid","Suicidal"};
-				RECT rc={350,260+55*i,350+300,260+55*i+50};
+				RECT rc={350,190+50*i,350+300,190+50*i+50};
 				mTextViewDlgChoice[i].InitTextView(bg->hDC(),rc,50,0xFFFFFF,str[i]);
 			}
-			setDlgTextColor();
-			for(int i=0;i<5;i++)mTextViewDlgChoice[i].OnTimer();
-			mTextViewDlgTitle->OnTimer();
-			//mDlgInitFlg=true;
-		}
-		return 0;
-	}else if (mSelectDlgFlg) {
-		CBltInfo bi_blacken(BLT_BLACKEN, 100);
-		CImageBlender::Blt(bg, &m_image_bg, &bi_blacken, WND_RECT, 0, 0);
-		CShapeBlender::fillRect(bg, 334, 440, 633, 719, 0x000000);
-		int mgnY = 250;
-		showDialog(mgnY);
-		if (mDlgInitFlg == false) {
-			RECT rc = { 320,mgnY,350 + 300,mgnY + 60 };
-			mTextViewDlgTitle->SetRect(rc);
-			mTextViewDlgTitle->SetText("-Story Mode-");
+
+			RECT rc2 = { 320,440,350 + 300,440 + 50 };
+			mTextViewDlgTitle2->SetRect(rc2);
+			mTextViewDlgTitle2->SetText("-Story Mode-");
 			for (int i = 0; i<2; i++) {
-				static char str[3][16] = {"OFF","ON"};
-				RECT rc = { 420,mgnY +70 + 55 * i,420 + 300,mgnY +70 + 55 * i + 50 };
-				mTextViewDlgChoice[i].InitTextView(bg->hDC(), rc, 50, 0xFFFFFF, str[i]);
+				static char str[2][16] = { "OFF","ON" };
+				RECT rc = { 350,510 + 50 * i,350 + 300,510 + 50 * i + 50 };
+				mTextViewDlgChoice2[i].InitTextView(bg->hDC(), rc, 40, 0xFFFFFF, str[i]);
 			}
+
 			setDlgTextColor();
-			for (int i = 0; i<2; i++)mTextViewDlgChoice[i].OnTimer();
+			for (int i = 0; i<5; i++)mTextViewDlgChoice[i].OnTimer();
+			for (int i = 0; i<2; i++)mTextViewDlgChoice2[i].OnTimer();
 			mTextViewDlgTitle->OnTimer();
+			mTextViewDlgTitle2->OnTimer();
 			//mDlgInitFlg=true;
 		}
 		return 0;
-	}else if (mConfigDlgFlg) {	
+	} else if (mConfigDlgFlg) {	
 		CBltInfo bi_blacken(BLT_BLACKEN,100);
 		CImageBlender::Blt(bg,&m_image_bg,&bi_blacken,WND_RECT,0,0);
 		CShapeBlender::fillRect(bg,334,440,633,719,0x000000);

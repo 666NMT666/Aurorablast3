@@ -22,9 +22,11 @@ private:
 
 	CItemManager* mItemManager;
 	CItemManager* mItemManagerFront;
+	
 	CEnemyBulletManager* mEBManager;
 	CEnemyMissileManager* mEMManager;
 	CEnemyLazerManager* mELManager;
+
 	CEnemyGeneratorManager* mGeneratorManager;
 	CBossManager* mBossManager;
 	CBattleFrame* mBattleFrame;

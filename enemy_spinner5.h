@@ -27,11 +27,22 @@ void CEnemySpinner5::UpdateEnemy() {
 
 	mInvincibleFlg = false;
 	mBackEffectManager->CreateEffect((int)m_x, (int)m_y, EFFECT_BACKLIGHT1, 0, 0, 0, 0, 2, 0, 0);
+	if (mTimer == 100) {
+		int angle = ExMath::angleBetweenPoints(m_x, m_y, mPlayer->GetX(), mPlayer->GetY());
+		AngleMissile((int)m_x + 50, (int)m_y + 125, EB_KILLERSHOT_160x160, 0, KILLERSHOT_GRAVITY, (double)(5 + rand() % 4), angle, -280000, 0, rand() % 20 - 10);
 
+		//AngleMissile((int)m_x - 50, (int)m_y + 125, EB_DEPTHCHARGE_60x30, 3, EMISSILE_GRAVITY_MINE, (double)(5 + rand() % 4), 90 + rand() % 19 - 9, 0, 0, rand() % 20 - 10);
+	}
+	if (mTimer == 150) {
+		int angle = ExMath::angleBetweenPoints(m_x, m_y, mPlayer->GetX(), mPlayer->GetY());
+		AngleMissile((int)m_x + 50, (int)m_y + 125, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, (double)(5 + rand() % 4), angle, 80000, 0, rand() % 20 - 10);
+
+		//AngleMissile((int)m_x - 50, (int)m_y + 125, EB_DEPTHCHARGE_60x30, 3, EMISSILE_GRAVITY_MINE, (double)(5 + rand() % 4), 90 + rand() % 19 - 9, 0, 0, rand() % 20 - 10);
+	}
 	if (mTimer>100 - mGameLevel * 4) {
 		if (mTimer % 2 == 0 && mTimer % 20<10) {
-			mSE->PlaySingleSound(SE_EXP2);
-			NormalShot(m_x, m_y, EB_40, 0, 6 + rand() % 5);
+//			mSE->PlaySingleSound(SE_EXP2);
+//			NormalShot(m_x, m_y, EB_40, 0, 6 + rand() % 5);
 		}
 	}
 }
