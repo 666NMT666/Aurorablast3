@@ -5,11 +5,22 @@
 #include "image_blender.h"
 
 using namespace std;
-
+enum TAnimateIn {
+	ANM_NULL,
+	ANM_FROM_LEFT,
+	ANM_FROM_RIGHT,
+	ANM_FADE_IN,
+	};
+enum TAnimateOut {
+	ANM_NULL,
+	ANM_TO_LEFT,
+	ANM_TO_RIGHT,
+	ANM_FADE_OUT,
+	};
 typedef struct _TChatScene {
-	string str[4];
-	int anm_in;
-	int anm_out;
+	string str;
+	TAnimateIn anm_in;
+	TAnimateOut anm_out;
 	int img_id;
 } TChatScene;
 
@@ -19,7 +30,7 @@ private:
 	CImage32 mImgBord;
 	CImage32 mImgCharactor[4];
 	string mChatStr[7][4];
-	TChatScene mScene[7];
+	TChatScene mScene[7][4];
 	static const int MGN_BOTTOM=40;
 	
 public:
@@ -30,6 +41,8 @@ public:
 	}
     
 	CChat() {
+		
+		mScene[0][0]={'',0,0,0};
 		mImgBord.load("dat/img/chat/bord.bmp");
 		mImgCharactor[0].load("dat/img/dummy.bmp");
 		mImgCharactor[1].load("dat/img/dummy.bmp");
