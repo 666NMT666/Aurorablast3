@@ -24,8 +24,8 @@ private:
 	
 public:
 	void showChat(CImage32* bg, int stage, int num) {
-		int x=(BATTLE_LEFT+BATTLE_RIGHT)/2 - mImgBord->Width()/2;
-		int y = BATTLE_BOTTOM-MGN_BOTTOM-mImgBord->Height();
+		int x=(BATTLE_LEFT+BATTLE_RIGHT)/2 - mImgBord.Width()/2;
+		int y = BATTLE_BOTTOM-MGN_BOTTOM-mImgBord.Height();
 		CImageBlender::Blt(bg, &mImgBord, x, y);
 	}
     
