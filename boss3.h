@@ -4,8 +4,8 @@ private:
 	int mCicleCounter;
 public:
 	CBoss3():CBoss(){
-		mLife=460;
-		mExLife=0;
+		mLife=40;
+		mExLife=1;
 		mLife0=mLife;
 		mCicleCounter=0;
 	}
@@ -21,8 +21,8 @@ public:
 void CBoss3::Saw() {
 	for (int i = 0; i < NUM_WHEELS; i++) {
 		int a = (mTimer * 23) % 360;
-		mParts[i+2].SetAngle(a);
-		mParts[i + NUM_WHEELS + 2].SetAngle(-a);
+		mParts[i+4].SetAngle(a);
+		mParts[i + NUM_WHEELS + 4].SetAngle(-a);
 	}
 
 	//‚±‚Ì•Ó‚ÅAŠewheel‚©‚çAngleShot();
@@ -43,17 +43,15 @@ void CBoss3::Update(){
 	UpdateBoss();
 	UpdateGameObject();
 	if(mExLife<0)return;
-	Update1();
-	return;
 	if(mExLife==1){
-		Update2();
-	}else if(mExLife==0){
 		Update1();
+	}else if(mExLife==0){
+		Update2();
 	}
 }
 
 void CBoss3::Update1(){
-	Saw();
+	mBackParts[0].SetBltType(BLT_NULL);
 	if(mTimer==1){
 		m_y=BATTLE_BOTTOM+m_height/2;
 		m_x=(BATTLE_RECT.right+BATTLE_RECT.left)/2;
@@ -143,6 +141,21 @@ void CBoss3::Update1(){
 }
 
 void CBoss3::Update2(){
+	Saw();
+	if (mTimer == 1) {
+		for (int i = 2; i < mMaxParts; i++) {
+			mParts[i].SetBltType(BLT_KEY);
+		}
+		for (int i = 0; i < mMaxBackParts; i++) {
+			mBackParts[i].SetBltType(BLT_KEY);
+		}
+	}
+	if (mTimer < 20) {
+		SetImg(BOSS3_2);
+		CExRect::InitRect(&mRectPlayerHit, mRectPlayerHit.left, mRectPlayerHit.top, mRectPlayerHit.right, 130);
+		CExRect::InitRect(&mRectBulletHit, mRectBulletHit.left, mRectBulletHit.top, mRectBulletHit.right, 90);
+
+	}
 	if(mTimer<600){
 		double spd=8+mGameLevel*6+rand()%5;
 		int angle=150+rand()%(30+mGameLevel*6)-(30+mGameLevel*6)/2;
@@ -160,6 +173,27 @@ void CBoss3::Create(int x,int y,int kind,int subKind,double vx,double vy,const C
 	CreateBoss();
 	mParts[0].InitParts(COMMON_PARTS_CANNON170x500,m_width/2+100,298);
 	mParts[1].InitParts(COMMON_PARTS_CANNON170x500,m_width/2-100,298);
+
+	mParts[2].InitParts(BOSS_PARTS_BOSS3_CHELICERAE_LEFT, m_width / 2 - 30, 53);
+	mParts[3].InitParts(BOSS_PARTS_BOSS3_CHELICERAE_RIGHT, m_width / 2 + 30, 53);
+
+	mParts[4].InitParts(BOSS_PARTS_BOSS3_LEG1_LEFT, m_width / 2 - 80, 53);
+	mParts[5].InitParts(BOSS_PARTS_BOSS3_LEG1_RIGHT, m_width / 2 + 80, 53);
+	mParts[6].InitParts(BOSS_PARTS_BOSS3_LEG1_LEFT, m_width / 2 -100, 73);
+	mParts[7].InitParts(BOSS_PARTS_BOSS3_LEG1_RIGHT, m_width / 2 + 100, 73);
+
+	mParts[8].InitParts(BOSS_PARTS_BOSS3_LEG1_LEFT, m_width / 2 - 120, 93);
+	mParts[9].InitParts(BOSS_PARTS_BOSS3_LEG1_RIGHT, m_width / 2 + 120, 93);
+	mParts[10].InitParts(BOSS_PARTS_BOSS3_LEG1_LEFT, m_width / 2 - 140, 113);
+	mParts[11].InitParts(BOSS_PARTS_BOSS3_LEG1_RIGHT, m_width / 2 + 140, 113);
+
+	mBackParts[0].InitParts(BOSS_PARTS_BOSS3_TAIL1,m_width/2,117);
 	CExRect::InitRect(&mRectBulletHit,-m_width/2-20,-m_height/2,m_width/2+20,-30);
 	CExRect::InitRect(&mRectPlayerHit,-m_width/2-20,-m_height/2,m_width/2+20,20);
+
+	for (int i = 2; i < mMaxParts; i++) {
+		mParts[i].SetBltType(BLT_NULL);
+	}
+	mBackParts[0].SetBltType(BLT_NULL);
+	
 }
