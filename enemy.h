@@ -13,6 +13,7 @@ typedef struct _TEnemyFile{
 
 class CEnemy:public CEnemySideObject{
 protected:
+	bool mStanFlg;
 	bool mDisabledFlg;
 	static CImage32* mPartsImg;
 	int mGameLevel,mLife,mLife0,mExLife;
@@ -65,9 +66,11 @@ public:
 		mLandHeight=0;
 		mKilledTimer=0;
 		mHitCounter=0;
+		mStanFlg = false;
 	}
 	void Update();
 	void UpdateBasic();
+	void UpdateStan();
 	virtual void UpdateEnemy(){}
 	virtual void UpdateEnemyPre(){}
 	void Create(int x,int y,int kind,double vx,double vy,const CCreateInfo& info, TEnemyFile& data);
@@ -203,6 +206,11 @@ public:
 };
 CImage32* CEnemy::mPartsImg=new CImage32[ENEMY_PARTS_FILES];
 
+void CEnemy::UpdateStan() {
+	int rot= m_x0 / 23-12;
+	mBltInfo.angle = rot * mTimer / 10;
+}
+
 void CEnemy::UpdateBasic(){
 	m_x+=m_vx; m_y+=m_vy;
 	mBltInfo.type=BLT_KEY;
@@ -241,7 +249,8 @@ void CEnemy::UpdateBasic(){
 void CEnemy::Update(){
 	UpdateEnemyPre();
 	UpdateBasic();
-	if(mLife>0)UpdateEnemy();
+	if (mStanFlg) UpdateStan();
+	else if(mLife>0) UpdateEnemy();
 	UpdateGameObject();
 }
 
@@ -269,6 +278,12 @@ void CEnemy::Create(int x,int y,int kind,double vx,double vy,const CCreateInfo& 
 	CExRect::InitRect(&mRectPlayerHit,-m_width/2,-m_height/2,m_width/2,m_height/2-20);
 	CExRect::InitRect(&mRectScreenOut,-100-m_width/2,-100-m_height/2,BATTLE_RECT.right+100+m_width/2,BATTLE_RECT.bottom+100+m_height/2);
 	CreateEnemy();
+	if (mGameInfo->GetStage()) {
+		mStanFlg = true;
+		mBltInfo.angle = rand() % 360;
+		m_vy = (rand() % 150) * 0.1 + 12.0;
+		m_vx = (rand() % 100) * 0.1 - 5.0;
+	}
 }
 
 void CEnemy::Killed(){

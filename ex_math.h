@@ -95,7 +95,7 @@ int ExMath::normalizeBetween(int min,int max,int val){
 }
 
 double ExMath::asymptote(double from,double to,double t){
-	if(t<1)t=1;
+	if(t<1.0)t=1.0;
 	return to-(to-from)/t;
 }
 

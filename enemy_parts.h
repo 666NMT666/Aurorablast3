@@ -220,8 +220,32 @@ public:
 	void LimitAngle(int min,int max);
 	void AddAngle(int a);
 	void AddAngle(int a,int max,int min);
+
+	bool hitTest(int dx,int dy, int x,int y);
 	CVector GetHead();
 };
+
+bool CEnemyParts::hitTest(int dx,int dy,int x, int y) {
+	//mWidth, mHeight;
+	dx += (int)(mBltInfo.link_x*mBltInfo.zoom);
+	dy += (int)(mBltInfo.link_y*mBltInfo.zoom);
+
+	CVector v[4];
+	v[0].Set(-mBltInfo.link_x, -mBltInfo.link_y); // ç∂è„
+	v[1].Set(-mBltInfo.link_x + mWidth, -mBltInfo.link_y); // âEè„
+	v[2].Set(-mBltInfo.link_x + mWidth, -mBltInfo.link_y + mHeight); // âEâ∫
+	v[3].Set(-mBltInfo.link_x, -mBltInfo.link_y + mHeight); // ç∂â∫
+
+	// âÒì]ÅEägëÂÇÇ∑ÇÈ
+	for (int i = 0; i<4; i++) {
+		v[i].Mul(mBltInfo.zoom);
+		v[i].Rotate(N_PI*mBltInfo.angle);
+		v[i].Add(dx, dy);
+	}
+
+	test_fo = ExMath::isInPoligon(x, y, v, 4);
+	return ExMath::isInPoligon(x, y, v, 4);
+}
 
 void CEnemyParts::Blt(int x,int y,CImage32* src){
 

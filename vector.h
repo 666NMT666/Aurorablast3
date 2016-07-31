@@ -33,7 +33,8 @@ public:
 		return v;
 	}
 	static CVector EigenVector(double tx,double ty){
-		CVector v(tx/(tx*tx+ty*ty),ty/(tx*tx+ty*ty));
+		double r = sqrt(tx*tx + ty*ty);
+		CVector v(tx / r, ty / r);
 		return v;
 	}
 	static void getRect(CVector *v, int x,int y, int w,int h, int dl=0,int dt=0,int dr=0,int db=0) {

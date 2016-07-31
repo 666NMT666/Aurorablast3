@@ -13,21 +13,69 @@ public:
 	void Update1();
 	void Update2();
 
-	void Saw();
+	void Swing();
+	void SwingRight(double rate, int angle);
+	void SwingLeft(double rate, int angle);
 	void Create(int x,int y,int kind,int suKind,double vx,double vy,const CCreateInfo& info);
 	void MainFire(int j);
 };
 
-void CBoss3::Saw() {
-	for (int i = 0; i < NUM_WHEELS; i++) {
-		int a = (mTimer * 23) % 360;
-		mParts[i+4].SetAngle(a);
-		mParts[i + NUM_WHEELS + 4].SetAngle(-a);
+void CBoss3::Swing() {
+	mParts[0].InitParts(COMMON_PARTS_CANNON170x500, m_width / 2 + 110, 148);
+	mParts[1].InitParts(COMMON_PARTS_CANNON170x500, m_width / 2 - 110, 148);
+	for (int i = 0; i < 4; i++) {
+		static const int rnd[4] = {1,7,5,17};
+		mParts[4 + 2 * i].SetAngle(80 * cos(N_PI*mTimer + rnd[i] * 14) * sin(rnd[i]+N_PI * (13+rnd[i]) * mTimer));
+		mParts[4 + 2 * i + 1].SetAngle(80 * sin(N_PI*mTimer+rnd[i]*14) * sin(-N_PI+ rnd[i] * (13 + rnd[i]) * mTimer));
 	}
-
-	//‚±‚Ì•Ó‚ÅAŠewheel‚©‚çAngleShot();
-
+	for (int i = 0; i < 4; i++) {
+		LinkFrontParts(12 + 2 * i, 4 + 2 * i, -40 * sin(N_PI * 13 * mTimer));
+		LinkFrontParts(12 + 2 * i + 1, 4 + 2 * i + 1,  40 * sin(N_PI * 13 * mTimer));
+	}
+	for (int i = 0; i < 4; i++) {
+		LinkFrontParts(20 + 2 * i, 12 + 2 * i, -140 * sin(N_PI * 13 * mTimer));
+		LinkFrontParts(20 + 2 * i + 1, 12 + 2 * i + 1, 140 * sin(N_PI * 13 * mTimer));
+	}
 }
+
+void CBoss3::SwingRight(double rate, int angle) {
+	static const int rnd[4] = {25,1,9,55};
+	for (int i = 0; i < 4; i++) {
+		int a = mParts[4 + 2 * i + 1].GetAngle();
+		a = ExMath::asymptote(a, angle, rate);
+		mParts[4 + 2 * i + 1].SetAngle(a + rnd[i] / 2);
+	}
+	for (int i = 0; i < 4; i++) {
+		int a = mParts[12 + 2 * i + 1].GetAngle();
+		a = ExMath::asymptote(a, angle*1.2, rate);
+		LinkFrontParts(12 + 2 * i + 1, 4 + 2 * i + 1, a);
+	}
+	for (int i = 0; i < 4; i++) {
+		int a = mParts[20 + 2 * i + 1].GetAngle();
+		a = ExMath::asymptote(a, angle*1.4, rate);
+		LinkFrontParts(20 + 2 * i + 1, 12 + 2 * i + 1, a+rnd[i]);
+	}
+}
+
+void CBoss3::SwingLeft(double rate, int angle) {
+	static const int rnd[4] = { -25,-1,-9,-55 };
+	for (int i = 0; i < 4; i++) {
+		int a = mParts[4 + 2 * i].GetAngle();
+		a = ExMath::asymptote(a, angle, rate);
+		mParts[4 + 2 * i].SetAngle(a + rnd[i] / 2);
+	}
+	for (int i = 0; i < 4; i++) {
+		int a = mParts[12 + 2 * i].GetAngle();
+		a = ExMath::asymptote(a, angle*1.2, rate);
+		LinkFrontParts(12 + 2 * i, 4 + 2 * i, a);
+	}
+	for (int i = 0; i < 4; i++) {
+		int a = mParts[20 + 2 * i].GetAngle();
+		a = ExMath::asymptote(a, angle*1.4, rate);
+		LinkFrontParts(20 + 2 * i, 12 + 2 * i, a + rnd[i]);
+	}
+}
+
 void CBoss3::MainFire(int j){
 	CVector head=GetFrontPartsHead(j);
 	int angle=180-mParts[j].GetAngle();
@@ -141,7 +189,7 @@ void CBoss3::Update1(){
 }
 
 void CBoss3::Update2(){
-	Saw();
+	Swing();
 	if (mTimer == 1) {
 		for (int i = 2; i < mMaxParts; i++) {
 			mParts[i].SetBltType(BLT_KEY);
@@ -150,20 +198,55 @@ void CBoss3::Update2(){
 			mBackParts[i].SetBltType(BLT_KEY);
 		}
 	}
-	if (mTimer < 20) {
+	if (mTimer < 10) {
+		if (mTimer == 2) mSE->PlaySingleSound(SE_TND1);
+		if (mTimer % 4 == 0) mSE->PlaySingleSound(SE_EXP6);
+		if (mTimer % 4 == 2) mSE->PlaySingleSound(SE_EXP5);
+		if (mTimer % 4 == 0) {
+			for (int i = 0; i<6; i++)mEffectManager->CreateEffect((int)m_x, BATTLE_TOP, EFFECT_EXPLOSION_160, 0, rand() % 30 - 15, -rand() % 5 + i * 10, 0, 3, 0, 0);
+			mEffectManager->CreateEffect(m_x, m_y + 15 + m_height / 2, EFFECT_EXPLOSION_HEAD1, 0, 0, -15, 0, 1, 0, 0);
+			for (int i = 0; i<4; i++) {
+				mDebrisManager->CreateDebris((int)m_x, (int)m_y, 2, 0, 40 - rand() % 15, rand() % 15 - 40, 1, 0, 2, 10, 0);
+				mDebrisManager->CreateDebris((int)m_x, (int)m_y, 2, 0, -40 + rand() % 15, rand() % 15 - 40, 1, 0, 2, 10, 0);
+			}
+		}
+	}
+	if (mTimer < 40) {
 		SetImg(BOSS3_2);
 		CExRect::InitRect(&mRectPlayerHit, mRectPlayerHit.left, mRectPlayerHit.top, mRectPlayerHit.right, 130);
 		CExRect::InitRect(&mRectBulletHit, mRectBulletHit.left, mRectBulletHit.top, mRectBulletHit.right, 90);
 
 	}
-	if(mTimer<600){
-		double spd=8+mGameLevel*6+rand()%5;
-		int angle=150+rand()%(30+mGameLevel*6)-(30+mGameLevel*6)/2;
-		const int range=140;
-		if(mTimer%3==0){
-			mSE->PlaySingleSound(SE_SHT1);
-			AngleShot(m_x+rand()%range-range/2,m_y+rand()%range-range/2-50,EB_26,2,spd,angle);
-			AngleShot(m_x+rand()%range-range/2,m_y+rand()%range-range/2-50,EDAB_80,0,20+spd+2,angle);
+	if (mTimer < 120) {
+
+	}
+	else if (mTimer < 360) {
+		int tt = mTimer % 35;
+		if (tt < 20) {
+			SwingRight(tt*0.5, 80);
+			SwingLeft(tt*0.5, -80);
+		}
+		else {
+			SwingRight(tt*0.5, 80 - (tt - 20) * 20);
+			SwingLeft(tt*0.5, -80 + (tt - 20) * 20);
+		}
+	}
+	else {
+		mTimer = 40;
+	}
+
+	for (int i = 4; i < 27; i++) {
+		if (mParts[i].hitTest(
+			(int)m_x - m_width / 2 + mParts[i].GetTargetX() - mParts[i].GetStartX(),
+			(int)m_y - m_height / 2 + mParts[i].GetTargetY() - mParts[i].GetStartY(),
+			mPlayer->GetX(),
+			mPlayer->GetY())
+			) {
+			if (m_x != mPlayer->GetX() || m_y != mPlayer->GetY()) {
+				CVector v = CVector::EigenVector(m_x - mPlayer->GetX(), m_y - mPlayer->GetY());
+				mPlayer->ForcePlayer(15.0*v.x, 15.0*v.y);
+				mPlayer->AddInertia(30.0*v.x, 30.0*v.y);
+			}
 		}
 	}
 }
@@ -177,15 +260,32 @@ void CBoss3::Create(int x,int y,int kind,int subKind,double vx,double vy,const C
 	mParts[2].InitParts(BOSS_PARTS_BOSS3_CHELICERAE_LEFT, m_width / 2 - 30, 53);
 	mParts[3].InitParts(BOSS_PARTS_BOSS3_CHELICERAE_RIGHT, m_width / 2 + 30, 53);
 
-	mParts[4].InitParts(BOSS_PARTS_BOSS3_LEG1_LEFT, m_width / 2 - 80, 53);
-	mParts[5].InitParts(BOSS_PARTS_BOSS3_LEG1_RIGHT, m_width / 2 + 80, 53);
-	mParts[6].InitParts(BOSS_PARTS_BOSS3_LEG1_LEFT, m_width / 2 -100, 73);
-	mParts[7].InitParts(BOSS_PARTS_BOSS3_LEG1_RIGHT, m_width / 2 + 100, 73);
+	mParts[4].InitParts(BOSS_PARTS_BOSS3_LEG1_LEFT, m_width / 2 - 65, 35);
+	mParts[5].InitParts(BOSS_PARTS_BOSS3_LEG1_RIGHT, m_width / 2 + 65, 35);
+	mParts[6].InitParts(BOSS_PARTS_BOSS3_LEG1_LEFT_SMALL, m_width / 2 -75, 73);
+	mParts[7].InitParts(BOSS_PARTS_BOSS3_LEG1_RIGHT_SMALL, m_width / 2 + 75, 73);
+	mParts[8].InitParts(BOSS_PARTS_BOSS3_LEG1_LEFT_SMALL, m_width / 2 - 60, 93);
+	mParts[9].InitParts(BOSS_PARTS_BOSS3_LEG1_RIGHT_SMALL, m_width / 2 + 60, 93);
+	mParts[10].InitParts(BOSS_PARTS_BOSS3_LEG1_LEFT, m_width / 2 - 50, 118);
+	mParts[11].InitParts(BOSS_PARTS_BOSS3_LEG1_RIGHT, m_width / 2 + 50, 118);
 
-	mParts[8].InitParts(BOSS_PARTS_BOSS3_LEG1_LEFT, m_width / 2 - 120, 93);
-	mParts[9].InitParts(BOSS_PARTS_BOSS3_LEG1_RIGHT, m_width / 2 + 120, 93);
-	mParts[10].InitParts(BOSS_PARTS_BOSS3_LEG1_LEFT, m_width / 2 - 140, 113);
-	mParts[11].InitParts(BOSS_PARTS_BOSS3_LEG1_RIGHT, m_width / 2 + 140, 113);
+	mParts[11 + 1].InitParts(BOSS_PARTS_BOSS3_LEG2_LEFT);
+	mParts[11 + 2].InitParts(BOSS_PARTS_BOSS3_LEG2_RIGHT);
+	mParts[11 + 3].InitParts(BOSS_PARTS_BOSS3_LEG2_LEFT_SMALL);
+	mParts[11 + 4].InitParts(BOSS_PARTS_BOSS3_LEG2_RIGHT_SMALL);
+	mParts[11 + 5].InitParts(BOSS_PARTS_BOSS3_LEG2_LEFT_SMALL);
+	mParts[11 + 6].InitParts(BOSS_PARTS_BOSS3_LEG2_RIGHT_SMALL);
+	mParts[11 + 7].InitParts(BOSS_PARTS_BOSS3_LEG2_LEFT);
+	mParts[11 + 8].InitParts(BOSS_PARTS_BOSS3_LEG2_RIGHT);
+
+	mParts[19 + 1].InitParts(BOSS_PARTS_BOSS3_LEG3_LEFT);
+	mParts[19 + 2].InitParts(BOSS_PARTS_BOSS3_LEG3_RIGHT);
+	mParts[19 + 3].InitParts(BOSS_PARTS_BOSS3_LEG3_LEFT_SMALL);
+	mParts[19 + 4].InitParts(BOSS_PARTS_BOSS3_LEG3_RIGHT_SMALL);
+	mParts[19 + 5].InitParts(BOSS_PARTS_BOSS3_LEG3_LEFT_SMALL);
+	mParts[19 + 6].InitParts(BOSS_PARTS_BOSS3_LEG3_RIGHT_SMALL);
+	mParts[19 + 7].InitParts(BOSS_PARTS_BOSS3_LEG3_LEFT);
+	mParts[19 + 8].InitParts(BOSS_PARTS_BOSS3_LEG3_RIGHT);
 
 	mBackParts[0].InitParts(BOSS_PARTS_BOSS3_TAIL1,m_width/2,117);
 	CExRect::InitRect(&mRectBulletHit,-m_width/2-20,-m_height/2,m_width/2+20,-30);

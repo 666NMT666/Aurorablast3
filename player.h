@@ -30,6 +30,7 @@ private:
 	int mBombCounter;
 	int mInvincibleCounter;
 	double mVerticalSpeed,mHorizontalSpeed;
+	double inertiaX, inertiaY;
 	int mKilledCounter;
 	int mShotTimer;
 	int mPower,mBomb,mWepon,mLife;
@@ -54,6 +55,7 @@ public:
 		mSE=CSoundEffect::GetInstance();
 		mScore=CScore::GetInstance();
 		mImages=new CImage32("dat/img/player.bmp");
+		inertiaX = inertiaY = 0.0;
 	}
 	const int GetMaxExtendCounter() { return MAX_EXTEND_COUNTER; }
 	const int GetMaxLevelUpCounter() { return MAX_LEVEL_UP_COUNTER; }
@@ -131,6 +133,11 @@ public:
 	const int GetPower(){return mPower;}
 	const int GetWepon(){return mWepon;}
 	const int GetBomb(){return mBomb;}
+
+	void AddInertia(int x, int y) {
+		inertiaX = x;
+		inertiaY = y;
+	}
 
 	void ForcePlayer(int x, int y) {
 		m_x += x;
@@ -217,6 +224,20 @@ void CPlayer::Update(){
 	mShotTimer++;
 	Shot();
 	mTimer%=360;
+	ForcePlayer(inertiaX, inertiaY);
+	if (inertiaX > 0.1) {
+		inertiaX *= 0.95;
+	}
+	else {
+		inertiaX = 0;
+	}
+	
+	if (inertiaY > 0.1) {
+		inertiaY *= 0.95;
+	}
+	else {
+		inertiaY = 0;
+	}
 	
 	int spd=0;
 	if(mKeepZFlg && mRendaCounter==0){
