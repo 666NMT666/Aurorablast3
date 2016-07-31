@@ -8,11 +8,21 @@ protected:
 	CImage32* mImgEnding1;
 	CTextView* mTextView;
 	CGameInfo* mGameInfo;
+	
+	CEffectManager* mEffectManager;
+	CBulletManager* mBulletManager;
+	CEnemyManager* mEnemyManager;
+	
 public:
 	CEndingViewController():CViewController(),mWaitTimer(0),mStep(0),mOnZFlg(false){
 		mImgEnding1=new CImage32();
 		CImageFactory::InitBitmap(mImgEnding1,"dat/img/ending1.bmp");
 		mGameInfo=CGameInfo::GetInstance();
+		
+		mEffectManager=CEffectManager::GetInstance();
+		mBulletManager=CBulletManager::GetInstance();
+		mEnemyManager=CEnemyManager::GetInstance();
+		
 		CMusic::Stop();
 		CMusic::initMusic("dat/BGM/ed.ogg");
 		CMusic::Play();
