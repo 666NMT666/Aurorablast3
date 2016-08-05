@@ -197,7 +197,11 @@ void CTitleViewController::onKeyDownUp(){
 int CTitleViewController::onTimer(){
 	onTimerSuper();
 	
-	if(m_nextPage==ENDURANCE_VIEW_CONTROLLER){ mDlgFlg = mSelectStoryModeFlg = false;return ENDURANCE_VIEW_CONTROLLER;}
+	if(m_nextPage==ENDURANCE_VIEW_CONTROLLER){
+		mDlgFlg = mSelectStoryModeFlg = false;
+		////////////mGameInfo->Continued(); return ENDING_VIEW_CONTROLLER; ///////
+		return ENDURANCE_VIEW_CONTROLLER;
+	}
 	else if(m_nextPage==CONFIG_VIEW_CONTROLLER){mConfigDlgFlg=false; return CONFIG_VIEW_CONTROLLER;}
 	else if(m_nextPage==REPLAY_VIEW_CONTROLLER)return REPLAY_VIEW_CONTROLLER;
 	else if(m_nextPage==NAME_ENTRY_VIEW_CONTROLLER)return NAME_ENTRY_VIEW_CONTROLLER;

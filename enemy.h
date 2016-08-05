@@ -278,7 +278,7 @@ void CEnemy::Create(int x,int y,int kind,double vx,double vy,const CCreateInfo& 
 	CExRect::InitRect(&mRectPlayerHit,-m_width/2,-m_height/2,m_width/2,m_height/2-20);
 	CExRect::InitRect(&mRectScreenOut,-100-m_width/2,-100-m_height/2,BATTLE_RECT.right+100+m_width/2,BATTLE_RECT.bottom+100+m_height/2);
 	CreateEnemy();
-	if (mGameInfo->GetStage()) {
+	if (mGameInfo->GetStage()==6 && mKind!=48) {
 		mStanFlg = true;
 		mBltInfo.angle = rand() % 360;
 		m_vy = (rand() % 150) * 0.1 + 12.0;
@@ -361,12 +361,12 @@ void CEnemy::Blt(CImage32* dest,CImage32* img){
 	}
 
 	if(mBltInfo.zoom==1.0 && mBltInfo.angle==0){
-		if(mBltInfo.hole_r==0)CImageBlender::Blt(dest, img, &mBltInfo, BATTLE_RECT, (int)m_x - mBltInfo.link_x, (int)m_y - mBltInfo.link_y, mBltX, mBltY, m_width, m_height);
-		else CImageBlenderHoled::Blt(dest, img, BATTLE_RECT, (int)m_x - mBltInfo.link_x, (int)m_y - mBltInfo.link_y, m_width, m_height, mBltInfo.hole_x, mBltInfo.hole_y,mBltInfo.hole_r);
+		if(mBltInfo.hole_r==0)CImageBlender::Blt(dest, img, &mBltInfo, mRectBlt, (int)m_x - mBltInfo.link_x, (int)m_y - mBltInfo.link_y, mBltX, mBltY, m_width, m_height);
+		else CImageBlenderHoled::Blt(dest, img, mRectBlt, (int)m_x - mBltInfo.link_x, (int)m_y - mBltInfo.link_y, m_width, m_height, mBltInfo.hole_x, mBltInfo.hole_y,mBltInfo.hole_r);
 	}else if(mBltInfo.zoom!=1.0 && mBltInfo.angle==0)
-		CImageBlenderStretch::Blt(dest,img,&mBltInfo,BATTLE_RECT,(int)(m_x-mBltInfo.link_x*mBltInfo.zoom),(int)(m_y-mBltInfo.link_y*mBltInfo.zoom),mBltX,mBltY,m_width,m_height);
+		CImageBlenderStretch::Blt(dest,img,&mBltInfo, mRectBlt,(int)(m_x-mBltInfo.link_x*mBltInfo.zoom),(int)(m_y-mBltInfo.link_y*mBltInfo.zoom),mBltX,mBltY,m_width,m_height);
 	else
-		CImageBlenderTexmap::Blt(dest,img,&mBltInfo,BATTLE_RECT,(int)(m_x-mBltInfo.link_x*mBltInfo.zoom),(int)(m_y-mBltInfo.link_y*mBltInfo.zoom),mBltX,mBltY,m_width,m_height);
+		CImageBlenderTexmap::Blt(dest,img,&mBltInfo, mRectBlt,(int)(m_x-mBltInfo.link_x*mBltInfo.zoom),(int)(m_y-mBltInfo.link_y*mBltInfo.zoom),mBltX,mBltY,m_width,m_height);
 
 	if(mMaxParts>0){
 		for(int i=0;i<mMaxParts;i++){

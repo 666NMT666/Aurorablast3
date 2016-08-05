@@ -56,6 +56,7 @@
 #include "enemy_robo3.h"
 #include "enemy_amblypygi1.h"
 #include "enemy_amblypygi2.h"
+#include "enemy_earth.h"
 
 enum TEnemyKind {
 	ENEMY_FO1,
@@ -106,6 +107,7 @@ enum TEnemyKind {
 	ENEMY_ROBO3,
 	ENEMY_PROPELLER1,
 	ENEMY_AMBLYPYGI2,
+	ENEMY_EARTH,
 	ENEMY_FILES,
 };
 
@@ -196,6 +198,7 @@ void CEnemyManager::Create2(int x, int y, int kind, double vx, double vy, const 
 		case ENEMY_ROBO3:obj = new CEnemyRobo3(); break;
 		case ENEMY_AMBLYPYGI1:obj = new CEnemyAmblypygi1(); break;
 		case ENEMY_AMBLYPYGI2:obj = new CEnemyAmblypygi2(); break;
+		case ENEMY_EARTH:obj = new CEnemyEarth(); break;
 		default:obj = new CEnemy(); break;
 	}
 	obj->Create(x,y,kind,vx,vy,info, ENEMY_DATA[kind]);

@@ -66,7 +66,7 @@ double ExMath::sigmoid(int t,int midT,int gamma, int Amp){
 }
 
 double ExMath::internalDividingPoint(int left,int right,double div){
-	return div-div*left + div*right;
+	return left-div*left + div*right;
 }
 
 double ExMath::internalDividingPoint(int left,int right,double divA,double divB){

@@ -4,7 +4,7 @@ private:
 	int mCicleCounter;
 public:
 	CBoss3():CBoss(){
-		mLife=40;
+		mLife=420;
 		mExLife=1;
 		mLife0=mLife;
 		mCicleCounter=0;
@@ -139,7 +139,20 @@ void CBoss3::Update1(){
 			for(int i=0;i<3;i++)
 				AngleShot(head.x,head.y,EB_80,0,spd+i*2,90);
 		}
-	}else if(mTimer<600){
+	}
+	else if (mTimer<600) {
+		if (mTimer % 8 == 0) {
+			mSE->PlaySingleSound(SE_EXP2);
+			mCounter++;
+			for (int i = 0; i<3 + mGameLevel / 2; i++) {
+				AngleShot(m_x, m_y - 100, EB_80, 0, (double)(1 - i - (4 - mGameLevel)), 30 * mCounter + 20);
+				AngleShot(m_x, m_y - 100, EB_40, 0, (double)(13 - i - (4 - mGameLevel)), 30 * mCounter + 30);
+				AngleShot(m_x, m_y - 100, EB_80, 0, (double)(13 - i - (4 - mGameLevel)), -30 * mCounter + 20);
+				AngleShot(m_x, m_y - 100, EB_40, 0, (double)(13 - i - (4 - mGameLevel)), -30 * mCounter + 30);
+			}
+		}
+	}
+	else if(mTimer<800){
 		int freq[5]={32,30,26,20,16};
 		if(mTimer%freq[mGameLevel]==0){
 			int j=rand()%2;
@@ -165,17 +178,6 @@ void CBoss3::Update1(){
 			for(int i=0;i<3;i++)
 				AngleShot(head.x,head.y,EB_80,0,spd+i*2,90);
 		}
-	}else if(mTimer<800){
-		if(mTimer%8==0){
-			mSE->PlaySingleSound(SE_EXP2);
-			mCounter++;
-			for(int i=0;i<3+mGameLevel/2;i++){
-				AngleShot(m_x, m_y-100,EB_80,0,(double)(1-i-(4-mGameLevel)),30*mCounter+20);
-				AngleShot(m_x, m_y-100,EB_40,0,(double)(13-i-(4-mGameLevel)),30*mCounter+30);
-				AngleShot(m_x, m_y-100,EB_80,0,(double)(13-i-(4-mGameLevel)),-30*mCounter+20);
-				AngleShot(m_x, m_y-100,EB_40,0,(double)(13-i-(4-mGameLevel)),-30*mCounter+30);
-			}
-		}
 	}else{
 		mTimer=10;
 		mCicleCounter++;
@@ -197,13 +199,16 @@ void CBoss3::Update2(){
 		for (int i = 0; i < mMaxBackParts; i++) {
 			mBackParts[i].SetBltType(BLT_KEY);
 		}
+		SetImg(BOSS3_2);
+		CExRect::InitRect(&mRectPlayerHit, mRectPlayerHit.left, mRectPlayerHit.top, mRectPlayerHit.right, 130);
+		CExRect::InitRect(&mRectBulletHit, mRectBulletHit.left, mRectBulletHit.top, mRectBulletHit.right, 90);
 	}
-	if (mTimer < 10) {
+	if (mTimer < 25) {
 		if (mTimer == 2) mSE->PlaySingleSound(SE_TND1);
 		if (mTimer % 4 == 0) mSE->PlaySingleSound(SE_EXP6);
 		if (mTimer % 4 == 2) mSE->PlaySingleSound(SE_EXP5);
 		if (mTimer % 4 == 0) {
-			for (int i = 0; i<6; i++)mEffectManager->CreateEffect((int)m_x, BATTLE_TOP, EFFECT_EXPLOSION_160, 0, rand() % 30 - 15, -rand() % 5 + i * 10, 0, 3, 0, 0);
+			for (int i = 0; i<6; i++)mEffectManager->CreateEffect((int)m_x, BATTLE_TOP, EFFECT_EXPLOSION_160, 0, rand() % 30 - 15, -rand() % 5 + i * 10+5, 0, 3, 0, 0);
 			mEffectManager->CreateEffect(m_x, m_y + 15 + m_height / 2, EFFECT_EXPLOSION_HEAD1, 0, 0, -15, 0, 1, 0, 0);
 			for (int i = 0; i<4; i++) {
 				mDebrisManager->CreateDebris((int)m_x, (int)m_y, 2, 0, 40 - rand() % 15, rand() % 15 - 40, 1, 0, 2, 10, 0);
@@ -211,16 +216,19 @@ void CBoss3::Update2(){
 			}
 		}
 	}
-	if (mTimer < 40) {
-		SetImg(BOSS3_2);
-		CExRect::InitRect(&mRectPlayerHit, mRectPlayerHit.left, mRectPlayerHit.top, mRectPlayerHit.right, 130);
-		CExRect::InitRect(&mRectBulletHit, mRectBulletHit.left, mRectBulletHit.top, mRectBulletHit.right, 90);
 
+	if (mTimer < 100) {
+		
 	}
-	if (mTimer < 120) {
+	else if (mTimer < 260) {
+		if (mTimer % 70-mGameInfo->GetLevel()*5 == 0) {
+			mSE->PlaySingleSound(SE_EXP2);
+			int p[5] = { EMISSILE_ZIGZAG,0,0,0,0 };
+			CCreateInfo info(p);
+			int angle = ExMath::angleBetweenPoints(m_x, m_y, mPlayer->GetX(), mPlayer->GetY());
+			AngleMissile((int)m_x, (int)m_y, EB_MINE_30x30, 0, 10.0, angle, CCreateInfo::CCreateInfo(EMISSILE_ZIGZAG, 0, 0, 0, 0));
+		}
 
-	}
-	else if (mTimer < 360) {
 		int tt = mTimer % 35;
 		if (tt < 20) {
 			SwingRight(tt*0.5, 80);
@@ -229,10 +237,85 @@ void CBoss3::Update2(){
 		else {
 			SwingRight(tt*0.5, 80 - (tt - 20) * 20);
 			SwingLeft(tt*0.5, -80 + (tt - 20) * 20);
+			if (mPlayer->GetX()>m_x + 100 || mPlayer->GetX() < m_x - 100) {
+				mPlayer->ForcePlayer(0, 2);
+			}
+		}
+	}
+	else if (mTimer < 300) {
+		int freq[5] = { 22,20,18,17,16 };
+		if (mTimer%freq[mGameLevel] == 0) {
+			for (int j = 0; j < 2; j++) {
+				mSE->PlaySingleSound(SE_EXP3);
+				int p[5] = { 0,20,30,1,0 };
+				CCreateInfo info(p);
+				for (int i = 0; i < 5; i++) {
+					int x = mParts[j].GetTargetX() - m_width / 2;
+					int y = mParts[j].GetTargetY() - m_height / 2;
+					int dx = 40 * sin(N_PI*(20 + 30 * i));
+					int dy = 40 * cos(N_PI*(20 + 30 * i));
+					mEMManager->Create<CEnemyMissile>((int)m_x + x + dx, (int)m_y + y + dy, 0, 1, dx / 2, dy / 2, info);
+					mEMManager->Create<CEnemyMissile>((int)m_x + x - dx, (int)m_y + y + dy, 0, 1, -dx / 2, dy / 2, info);
+				}
+			}
+		}
+	}
+	else if (mTimer < 480) {
+		int tt = mTimer - 300;
+		if (tt < 100) {
+			SwingRight(tt*0.5, 80);
+			SwingLeft(tt*0.5, -80);
+
+		}
+		else if(tt<120) {
+			SwingRight(tt*0.5, 80 - (tt - 100) * 20);
+			SwingLeft(tt*0.5, -80 + (tt - 100) * 20);
+			if (tt == 110) {
+				mSE->PlaySingleSound(SE_BOM1);
+				CCreateInfo info(KILLERSHOT_GRAVITY,0,0,0,0);
+				AngleMissile((int)m_x, 10, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, 20, 90, 80000, 0, 0);
+			}
+		}
+	}
+	else if (mTimer < 800) {
+		int tt = mTimer % 70;
+		int ttt = mTimer % 35;
+		if (tt < 20) {
+			SwingRight(ttt*0.5, 80);
+		}
+		else if (tt<35) {
+			SwingRight(ttt*0.5, 80 - (ttt - 20) * 20);
+			if (tt == 25) {
+				mSE->PlaySingleSound(SE_BOM1);
+				CCreateInfo info(KILLERSHOT_GRAVITY, 0, 0, 0, 0);
+				AngleMissile((int)m_x +100, 10, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, 20, 90, 80000, 0, 0);
+			}
+		}
+		else if (tt < 35+20) {
+			SwingLeft(ttt*0.5, -80);
+		}
+		else if (tt<70) {
+			SwingLeft(ttt*0.5, -80 + (ttt - 20) * 20);
+			if (tt == 30+25) {
+				mSE->PlaySingleSound(SE_BOM1);
+				CCreateInfo info(KILLERSHOT_GRAVITY, 0, 0, 0, 0);
+				AngleMissile((int)m_x - 100, 10, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, 20, 90, 80000, 0, 0);
+			}
 		}
 	}
 	else {
 		mTimer = 40;
+	}
+
+	if (mTimer % 5 == 0 && mTimer%100 <40) {
+		double spd = (double)(14 + mGameLevel * 4 + rand() % 10);
+		mSE->PlaySingleSound(SE_EXP4);
+		CVector head = GetFrontPartsHead(0);
+		for (int i = 0; i<3; i++)
+			AngleShot(head.x, head.y, EB_80, 0, spd + i * 2, 90);
+		head = GetFrontPartsHead(1);
+		for (int i = 0; i<3; i++)
+			AngleShot(head.x, head.y, EB_80, 0, spd + i * 2, 90);
 	}
 
 	for (int i = 4; i < 27; i++) {
@@ -245,7 +328,7 @@ void CBoss3::Update2(){
 			if (m_x != mPlayer->GetX() || m_y != mPlayer->GetY()) {
 				CVector v = CVector::EigenVector(m_x - mPlayer->GetX(), m_y - mPlayer->GetY());
 				mPlayer->ForcePlayer(15.0*v.x, 15.0*v.y);
-				mPlayer->AddInertia(30.0*v.x, 30.0*v.y);
+				//mPlayer->AddInertia(30.0*v.x, 30.0*v.y);
 			}
 		}
 	}

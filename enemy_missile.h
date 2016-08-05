@@ -11,7 +11,10 @@ enum TMissileMotion{
 	EMISSILE_DEPTHCHARGE_Y,
 	KILLERSHOT_GRAVITY,
 	EMISSILE_GRAVITY_MINE,
-
+	EMISSILE_ZIGZAG,
+	EMISSILE_BEAM,
+	EMISSILE_HOCKEY,
+	EMISSILE_HOCKEY_Y,
 	EMISSILE_MOTIONS,
 };
 enum TMissileFile {
@@ -52,6 +55,7 @@ private:
 	int mParams[5];
 	int mMotionKind;
 	int mImgRotation;
+	int mTargetX, mTargetY;
 
 	void StopAndGo();
 	void NormalShot();
@@ -65,12 +69,17 @@ private:
 	void DepthchargeY();
 	void Gravity();
 	void GravityMine();
+	void ZigZag();
+	void Beam();
+	void Hockey();
+	void HockeyY();
 
 public:
 	CEnemyMissile():CEnemySideObject(),mLife(0),mLethalFlg(false){
 		mMotionKind=0;
 		mImgRotation=0;
 		mIntervalAnim=1;
+		mTargetX=mTargetY=0;
 		mNumCycle=1;
 		mEffectManager=CEffectManager::GetInstance();
 		mEBManager=CEnemyBulletManager::GetInstance();
@@ -101,6 +110,10 @@ void CEnemyMissile::Update(){
 		case EMISSILE_DEPTHCHARGE_Y: DepthchargeY(); break; 
 		case KILLERSHOT_GRAVITY: Gravity(); break;
 		case EMISSILE_GRAVITY_MINE: GravityMine(); break;
+		case EMISSILE_ZIGZAG: ZigZag(); break;
+		case EMISSILE_BEAM: Beam(); break;
+		case EMISSILE_HOCKEY: Hockey(); break;
+		case EMISSILE_HOCKEY_Y: HockeyY(); break;
 		default: break;
 	}
 
@@ -432,5 +445,62 @@ void CEnemyMissile::GravityMine() {
 	else if (mTimer<50) {}
 	else if (mTimer % 6 == 0) {
 		mLife--;
+	}
+}
+
+void CEnemyMissile::ZigZag() {
+	mAutoDelFlg = true;
+	mLethalFlg = true;
+
+	int dx = 50 * sin(N_PI*mTimer * 11);
+	int dy = 50 * cos(N_PI*mTimer * 7);
+
+	CCreateInfo info = defaultCreateInfo;
+	double spd = (double)(rand() % 30)*0.1 + 2.0;
+	int angle = rand() % 360;
+	double vx = spd*cos(N_PI*angle);
+	double vy = spd*sin(N_PI*angle);
+	mEBManager->Create<CEnemyBullet>((int)m_x + dx, (int)m_y + dy, EB_20, rand()%3, vx, vy, info);
+	BackLightSmall(2);
+}
+
+void CEnemyMissile::Beam() {
+	mAutoDelFlg = true;
+	mLethalFlg = true;
+
+	if (mTimer == 1) {
+		m_x0 = m_x;
+		m_y0 = m_y;
+		mTargetX = mPlayer->GetX();
+		mTargetY = mPlayer->GetY();
+	}
+	m_x = ExMath::internalDividingPoint(m_x0, mTargetX, (mTimer) / 100.0);
+	m_y = ExMath::internalDividingPoint(m_y0, mTargetY, (mTimer) / 100.0);
+
+	CCreateInfo info = defaultCreateInfo;
+	for (int i = 0; i<10; i++) {
+		double spd = (double)(rand() % 50)*0.1 + 2.0;
+		int angle = rand() % 360;
+		double vx = spd*cos(N_PI*angle);
+		double vy = spd*sin(N_PI*angle);
+		mEBManager->Create<CEnemyBullet>((int)m_x, (int)m_y, EB_40, 0, vx, vy, info);
+	}
+}
+
+void CEnemyMissile::Hockey() {
+	mAutoDelFlg = true;
+	mLethalFlg = true;
+	if (m_x <= BATTLE_LEFT || m_x >= BATTLE_RIGHT) {
+		m_vx *= -1;
+		mSE->PlaySingleSound(SE_EXP1);
+	}
+}
+
+void CEnemyMissile::HockeyY() {
+	mAutoDelFlg = true;
+	mLethalFlg = true;
+	if (m_y <= BATTLE_TOP || m_y >= BATTLE_BOTTOM) {
+		m_vy *= -1;
+		mSE->PlaySingleSound(SE_EXP1);
 	}
 }

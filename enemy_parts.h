@@ -147,6 +147,7 @@ protected:
 	double mPurgeVX, mPurgeVY;
 	CImageDIB* mBG;
 	CBltInfo mBltInfo;
+	RECT mRectBlt;
 public:
 	CEnemyParts():mDelFlg(false),mDamagedFlg(false){
 		mStartX=mStartY=0;
@@ -158,6 +159,7 @@ public:
 		mBltInfo.type=BLT_KEY;
 		mImgId=0;
 		mPurgeVX=mPurgeVY=0.0;
+		mRectBlt = BATTLE_RECT;
 	}
 	CBltInfo* GetBltInfo(){return &mBltInfo;}
 	~CEnemyParts(){}
@@ -243,18 +245,17 @@ bool CEnemyParts::hitTest(int dx,int dy,int x, int y) {
 		v[i].Add(dx, dy);
 	}
 
-	test_fo = ExMath::isInPoligon(x, y, v, 4);
 	return ExMath::isInPoligon(x, y, v, 4);
 }
 
 void CEnemyParts::Blt(int x,int y,CImage32* src){
 
 	if(mBltInfo.zoom==1.0 && mBltInfo.angle==0){
-		CImageBlender::Blt(mBG,src,&mBltInfo,BATTLE_RECT,x,y,mBltX,mBltY,mWidth,mHeight);
+		CImageBlender::Blt(mBG,src,&mBltInfo, mRectBlt,x,y,mBltX,mBltY,mWidth,mHeight);
 	}else if(mBltInfo.zoom!=1.0 && mBltInfo.angle==0)
-		CImageBlenderStretch::Blt(mBG,src,&mBltInfo,BATTLE_RECT,x,y,mBltX,mBltY,mWidth,mHeight);
+		CImageBlenderStretch::Blt(mBG,src,&mBltInfo, mRectBlt,x,y,mBltX,mBltY,mWidth,mHeight);
 	else
-		CImageBlenderTexmap::Blt(mBG,src,&mBltInfo,BATTLE_RECT,x,y,mBltX,mBltY,mWidth,mHeight);
+		CImageBlenderTexmap::Blt(mBG,src,&mBltInfo, mRectBlt,x,y,mBltX,mBltY,mWidth,mHeight);
 }
 
 void CEnemyParts::LimitAngle(int min,int max){

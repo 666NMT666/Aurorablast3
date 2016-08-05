@@ -1,11 +1,19 @@
 #ifndef EFFECT_H
 #define EFFECT_H
 
-const int EFFECT_MOTION_SINGLE = 0;
-const int EFFECT_MOTION_LOOP = 1;
+enum TEffectMotion {
+	EFFECT_MOTION_SINGLE,
+	EFFECT_MOTION_LOOP,
+	EFFECT_MOTION_SINGLE_CYCLE_ZOOM,
+	EFFECT_MOTION_SINGLE_CYCLE_ZOOM_IN,
+	EFFECT_MOTION_FADE_OUT,
+};
+
+
 class CEffect:public CGameObject{
 	int mNumCycle;
 	int mMotion,mInterval,mEnd,mDelta;
+
 public:
 	CEffect():CGameObject(),mNumCycle(1),mMotion(0),mInterval(0),mEnd(0),mDelta(0){Reset();}
 	void Reset(){ResetGameObject();}
@@ -15,6 +23,7 @@ public:
 	void loopFlash();
 	void singleCycleZoom();
 	void singleCycleZoomIn();
+	void fadeOut();
 
 	void SetType(TBltType t) { mBltInfo.type = t; }
 	void SetNumCycle(int i) { mNumCycle = i; }
@@ -51,12 +60,22 @@ void CEffect::singleCycleZoomIn(){
 	if(cycleId>=mNumCycle){mDelFlg=true;}
 }
 
+void CEffect::fadeOut() {
+	int a = 255 - mTimer*mDelta;
+	if (a < 0) {
+		a = 0;
+		mDelFlg = true;
+	}
+	mBltInfo.alpha = a;
+}
+
 void CEffect::Update(){
 	UpdateGameObject();
-	if(mMotion==EFFECT_MOTION_SINGLE){singleCycleFlash();}
-	else if(mMotion==1){loopFlash();}
-	else if(mMotion==2){singleCycleZoom();}
-	else if(mMotion==3){singleCycleZoomIn();}
+	if (mMotion == EFFECT_MOTION_SINGLE) { singleCycleFlash(); }
+	else if (mMotion == EFFECT_MOTION_LOOP) { loopFlash(); }
+	else if (mMotion == EFFECT_MOTION_SINGLE_CYCLE_ZOOM) { singleCycleZoom(); }
+	else if (mMotion == EFFECT_MOTION_SINGLE_CYCLE_ZOOM_IN) { singleCycleZoomIn(); }
+	else if (mMotion == EFFECT_MOTION_FADE_OUT) { fadeOut(); }
 }
 
 void CEffect::Create(int x,int y,int kind,int subKind,double vx,double vy,const CCreateInfo& info){
@@ -65,7 +84,7 @@ void CEffect::Create(int x,int y,int kind,int subKind,double vx,double vy,const 
 	mBltInfo=info.bltInfo;
 	mDelFlg=false;
 	mMotion=info.params[0];
-	//mSubKind=info.params[1];
+	//mParam1=info.params[1];
 	mInterval=info.params[2];
 	mEnd=info.params[3];
 	mDelta=info.params[4];

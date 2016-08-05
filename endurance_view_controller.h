@@ -374,8 +374,7 @@ void CEnduranceViewController::onTimerTotalize(){
 		int max_stage=(mGameInfo->isTrial())?MAX_STAGE_TRIAL:MAX_STAGES[mGameInfo->GetLevel()];
 		if(mGameInfo->GetStage()>=max_stage-1){
 			if(mGameInfo->isTrial())mNextPage=NAME_ENTRY_VIEW_CONTROLLER;
-			else if(mGameInfo->didContinue()==false)mNextPage=ENDING_VIEW_CONTROLLER;
-			else mNextPage=NAME_ENTRY_VIEW_CONTROLLER;
+			else mNextPage=ENDING_VIEW_CONTROLLER;
 		}else{
 			mEBManager->Reset();
 			mLandscapeManager->Reset();

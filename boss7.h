@@ -3,7 +3,7 @@ private:
 	int mCicleCounter;
 public:
 	CBoss7():CBoss(){
-		mLife=640;
+		mLife=64;
 		mExLife=2;
 		mLife0=mLife;
 		mCicleCounter=0;

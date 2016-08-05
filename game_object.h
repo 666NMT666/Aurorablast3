@@ -47,6 +47,7 @@ protected:
 	CBltInfo mBltInfo;
 	CImageDIB* m_bg;
 	RECT mRectScreenOut;
+	RECT mRectBlt;
 public:
 	CGameObject():mDelFlg(false),mAutoDelFlg(false){ResetGameObject();}
 	virtual void Update(){}
@@ -107,9 +108,11 @@ public:
 		mCounter=0;
 		mBltInfo=BLT_INFO_KEY;
 		m_bg=CImageDIB::GetInstance();
+		mRectBlt = BATTLE_RECT;
 	}
 	const CBltInfo* const GetBltInfo(){ return &mBltInfo; }
 
+	void SetRectBlt(RECT rc) { mRectBlt = rc; }
 	void ForceFriction(double c) { ForceFriction(c, c); } /// c == 1 - Frction_Coefficient
 	void ForceFriction(double cx, double cy) {
 		m_vy *= cy;
@@ -127,11 +130,11 @@ const CCreateInfo CGameObject::defaultCreateInfo;
 
 void CGameObject::Blt(CImageDIB* dest,CImage32* src){
 	if(mBltInfo.zoom==1.0 && mBltInfo.angle==0){
-		CImageBlender::Blt(dest,src,&mBltInfo,BATTLE_RECT,(int)m_x-mBltInfo.link_x,(int)m_y-mBltInfo.link_y,mBltX,mBltY,m_width,m_height);
+		CImageBlender::Blt(dest,src,&mBltInfo, mRectBlt,(int)m_x-mBltInfo.link_x,(int)m_y-mBltInfo.link_y,mBltX,mBltY,m_width,m_height);
 	}else if(mBltInfo.zoom!=1.0 && mBltInfo.angle==0)
-		CImageBlenderStretch::Blt(dest,src,&mBltInfo,BATTLE_RECT,(int)(m_x-mBltInfo.link_x*mBltInfo.zoom),(int)(m_y-mBltInfo.link_y*mBltInfo.zoom),mBltX,mBltY,m_width,m_height);
+		CImageBlenderStretch::Blt(dest,src,&mBltInfo, mRectBlt,(int)(m_x-mBltInfo.link_x*mBltInfo.zoom),(int)(m_y-mBltInfo.link_y*mBltInfo.zoom),mBltX,mBltY,m_width,m_height);
 	else
-		CImageBlenderTexmap::Blt(dest,src,&mBltInfo,BATTLE_RECT,(int)(m_x-mBltInfo.link_x*mBltInfo.zoom),(int)(m_y-mBltInfo.link_y*mBltInfo.zoom),mBltX,mBltY,m_width,m_height);
+		CImageBlenderTexmap::Blt(dest,src,&mBltInfo, mRectBlt,(int)(m_x-mBltInfo.link_x*mBltInfo.zoom),(int)(m_y-mBltInfo.link_y*mBltInfo.zoom),mBltX,mBltY,m_width,m_height);
 
 }
 #endif
