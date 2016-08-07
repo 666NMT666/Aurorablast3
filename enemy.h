@@ -206,10 +206,6 @@ public:
 };
 CImage32* CEnemy::mPartsImg=new CImage32[ENEMY_PARTS_FILES];
 
-void CEnemy::UpdateStan() {
-	int rot= m_x0 / 23-12;
-	mBltInfo.angle = rot * mTimer / 10;
-}
 
 void CEnemy::UpdateBasic(){
 	m_x+=m_vx; m_y+=m_vy;
@@ -249,8 +245,7 @@ void CEnemy::UpdateBasic(){
 void CEnemy::Update(){
 	UpdateEnemyPre();
 	UpdateBasic();
-	if (mStanFlg) UpdateStan();
-	else if(mLife>0) UpdateEnemy();
+	if(mKilledTimer==0)UpdateEnemy();
 	UpdateGameObject();
 }
 
@@ -278,12 +273,6 @@ void CEnemy::Create(int x,int y,int kind,double vx,double vy,const CCreateInfo& 
 	CExRect::InitRect(&mRectPlayerHit,-m_width/2,-m_height/2,m_width/2,m_height/2-20);
 	CExRect::InitRect(&mRectScreenOut,-100-m_width/2,-100-m_height/2,BATTLE_RECT.right+100+m_width/2,BATTLE_RECT.bottom+100+m_height/2);
 	CreateEnemy();
-	if (mGameInfo->GetStage()==6 && mKind!=48) {
-		mStanFlg = true;
-		mBltInfo.angle = rand() % 360;
-		m_vy = (rand() % 150) * 0.1 + 12.0;
-		m_vx = (rand() % 100) * 0.1 - 5.0;
-	}
 }
 
 void CEnemy::Killed(){

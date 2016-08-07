@@ -218,7 +218,10 @@ void CBoss3::Update2(){
 	}
 
 	if (mTimer < 100) {
-		
+		for (int i = 0; i < 10; i++) {
+			AngleShot(m_x + 100 + rand() % 200, m_y - rand() % 60, EB_20, rand() % 3, 5 + i * 2, 90);
+			AngleShot(m_x - 100 - rand() % 200, m_y - rand() % 60, EB_20, rand() % 3, 5 + i * 2, 90);
+		}
 	}
 	else if (mTimer < 260) {
 		if (mTimer % 70-mGameInfo->GetLevel()*5 == 0) {

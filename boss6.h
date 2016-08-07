@@ -17,8 +17,16 @@ public:
 	void MainFire();
 	void MainFire2();
 	void SubFire(int i);
+	void Kyp(int st, int et);
 	void Kyp(int index, int st, int et);
 };
+
+void CBoss6::Kyp(int st, int et) {
+	if (mTimer >= et)return;
+	if (mTimer == st)mSE->PlaySingleSound(SE_KYP1);
+	int t = (mTimer - st);
+	mFrontEffectManager->CreateEclipsedCircle(m_x, m_y, 10 + t * 12, m_x - 4, m_y - 6, 8 + (int)(t*11.5), 0xFF000000);
+}
 
 void CBoss6::Kyp(int i, int st, int et) {
 	if (mTimer >= et)return;
@@ -147,11 +155,10 @@ void CBoss6::Update1(){
 			SubFire(1);
 			SubFire(2);
 		}
-		if (mTimer == 420) {
-			for (int i = 0; i < 36; i++) {
-				AngleMissile(m_x, m_y - m_height / 2 + mParts[0].GetTargetY(), EB_MINE_30x30, 1, mGameInfo->GetLevel() * 3 + 10, i * 10);
-				AngleMissile(m_x, m_y - m_height / 2 + mParts[0].GetTargetY(), EB_MINE_30x30, 1, mGameInfo->GetLevel() * 3 + 8, i * 10);
-			}
+		if (mTimer%4 == 0) {
+			int i = (mTimer - 400) / 4;
+			AngleMissile(m_x, m_y - m_height / 2 + mParts[0].GetTargetY(), EB_MINE_30x30, 1, mGameInfo->GetLevel() * 4 + 14, -90 - i * 10);
+			AngleMissile(m_x, m_y - m_height / 2 + mParts[0].GetTargetY(), EB_MINE_30x30, 1, mGameInfo->GetLevel() * 4 + 12, -90 + i * 10);
 		}
 	}
 	else if (700) {
@@ -252,10 +259,16 @@ void CBoss6::Update2() {
 		}
 	}
 	else if (mTimer < 600) {
-		if (mTimer % 60 == 0)mSE->PlaySingleSound(SE_TND1);
-		if (mTimer % 30 == 0) {
-			AngleMissile((int)m_x, (int)m_y + 100, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, (double)(5 + rand() % 4), 90 - 40, 80000, 0, rand() % 20 - 10);
-			AngleMissile((int)m_x, (int)m_y + 100, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, (double)(5 + rand() % 4), 90 + 40, 80000, 0, rand() % 20 - 10);
+		if (mTimer % 60 == 0){
+			mSE->PlaySingleSound(SE_BOM1);
+			if (mTimer % 120 == 0) {
+				AngleMissile((int)m_x+150, (int)m_y, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, 4, 90, 60000, 0, rand() % 20 - 10);
+				AngleMissile((int)m_x-150, (int)m_y, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, 4, 90, 60000, 0, rand() % 20 - 10);
+			}
+			else {
+				AngleMissile((int)m_x+150, (int)m_y, EB_KILLERSHOT_160x160, 0, KILLERSHOT_GRAVITY, 4, 90, -80000, 0, rand() % 20 - 10);
+				AngleMissile((int)m_x-150, (int)m_y, EB_KILLERSHOT_160x160, 0, KILLERSHOT_GRAVITY, 4, 90, -80000, 0, rand() % 20 - 10);
+			}			
 		}
 	}
 	else if (mTimer < 800) {
@@ -274,14 +287,26 @@ void CBoss6::Update2() {
 }
 
 void CBoss6::Update3() {
-	CExRect::InitRect(&mRectPlayerHit, mRectPlayerHit.left, mRectPlayerHit.top, mRectPlayerHit.right, 130);
+	int wobble_amp = 360 +120 - mTimer;
+	if (wobble_amp < 0)wobble_amp = abs(wobble_amp);
+	if (wobble_amp > 360)wobble_amp = 400;
+
+	int x_range = wobble_amp * sin(N_PI*mTimer);
+	m_x = 480 + x_range * sin(N_PI*mTimer*2);
+
+	int y_range = wobble_amp * sin(N_PI*mTimer);
+	m_y = 200 + y_range * sin(N_PI*mTimer);
+
+	const int radius = 146;
+	BackLightLarge();
+	CExRect::InitRect(&mRectPlayerHit, - 100, -radius, radius, radius);
+	CExRect::InitRect(&mRectBulletHit, - 100, -radius, radius, radius);
 	mBltInfo.angle=(mTimer*13)%360;
 	mBackParts[0].SetBltType(BLT_NULL);
 	for (int i = 0; i < 3; i++)mParts[i].SetBltType(BLT_NULL);
 	if (mTimer < 5) {
 		if (mTimer == 1) {
 			SetImg(BOSS6_2);
-			CExRect::InitRect(&mRectPlayerHit, -m_width / 2, -m_height / 2, m_width / 2, m_height / 2);
 		}
 		if (mTimer == 2) mSE->PlaySingleSound(SE_TND1);
 		if (mTimer % 4 == 0) mSE->PlaySingleSound(SE_EXP6);
@@ -305,57 +330,68 @@ void CBoss6::Update3() {
 		DirectFrontPartsTo(0, BATTLE_RIGHT, BATTLE_BOTTOM);
 	}
 	else if (mTimer<120) {
-
+		
 	}
 	else if (mTimer<250) {
 		double spd = 8 + mGameLevel * 6 + rand() % 5;
-		int angle = 30 + rand() % (30 + mGameLevel * 6) - (30 + mGameLevel * 6) / 2;
+		const int angle = rand() % (30 + mGameLevel * 6) - (30 + mGameLevel * 6) / 2+180+(mTimer-120);
 		const int range = 140;
 		if (mTimer % 3 == 0) {
-			mSE->PlaySingleSound(SE_SHT1);
-			AngleShot(m_x + rand() % range - range / 2, m_y + rand() % range - range / 2 - 50, EB_26, 2, spd, angle);
-			AngleShot(m_x + rand() % range - range / 2, m_y + rand() % range - range / 2 - 50, EDAB_80, 0, 20 + spd + 2, angle);
-			AngleShot(m_x + rand() % range - range / 2, m_y + rand() % range - range / 2 - 50, EB_26, 2, spd, 180 - angle);
-			AngleShot(m_x + rand() % range - range / 2, m_y + rand() % range - range / 2 - 50, EDAB_80, 0, 20 + spd + 2, 180 - angle);
+			for (int i = 0; i < 3; i++) {
+				int _angle = angle+i*120;
+				mSE->PlaySingleSound(SE_SHT1);
+				AngleShot(m_x + rand() % range - range / 2, m_y + rand() % range - range / 2 - 50, EB_26, 2, spd, _angle);
+				AngleShot(m_x + rand() % range - range / 2, m_y + rand() % range - range / 2 - 50, EDAB_80, 0, 20 + spd + 2, _angle);
+			}
 		}
 	}
 	else if (mTimer < 340) {
-		if (rand() % 9 == 0) {
+		if (rand() % 18 == 0) {
 			CCreateInfo info(300 + rand() % 360, rand() % 700, 0, 0, 0);
-			mEnemyManager->Create2(m_x, m_y, ENEMY_SPINNER3, 0, -5, info);
+			mEnemyManager->Create2(m_x, m_y, ENEMY_SPINNER4, 0, -5, info);
 		}
 	}
 	else if (mTimer < 400) {
 		if (mTimer == 320)mSE->PlaySingleSound(SE_KYP1);
-		Kyp(0, 320, 400);
+		Kyp(340, 400);
 
 		int angle1 = 5 * (mTimer - 200);
 		int angle2 = -13 * (mTimer - 200);
 		if (mTimer % 4 == 0 && mTimer > 330) {
-			AngleMissile(m_x, m_y - m_height / 2 + mParts[0].GetTargetY(), EB_MINE_30x30, 1, mGameInfo->GetLevel() * 3 + 10, angle1);
-			AngleMissile(m_x, m_y - m_height / 2 + mParts[0].GetTargetY(), EB_MINE_30x30, 1, mGameInfo->GetLevel() * 3 + 8, angle1);
+			AngleMissile(m_x, m_y, EB_MINE_30x30, 1, mGameInfo->GetLevel() * 3 + 10, angle1);
+			AngleMissile(m_x, m_y, EB_MINE_30x30, 1, mGameInfo->GetLevel() * 3 + 8, angle1);
 
-			AngleMissile(m_x, m_y - m_height / 2 + mParts[0].GetTargetY(), EB_MINE_30x30, 0, mGameInfo->GetLevel() * 3 + 7, angle2);
-			AngleMissile(m_x, m_y - m_height / 2 + mParts[0].GetTargetY(), EB_MINE_30x30, 0, mGameInfo->GetLevel() * 3 + 4, angle2);
+			AngleMissile(m_x, m_y, EB_MINE_30x30, 0, mGameInfo->GetLevel() * 3 + 7, angle2);
+			AngleMissile(m_x, m_y, EB_MINE_30x30, 0, mGameInfo->GetLevel() * 3 + 4, angle2);
 		}
 	}
 	else if (mTimer < 600) {
+		int d_angle = rand()%360;
 		if (mTimer % 60 == 0)mSE->PlaySingleSound(SE_TND1);
-		if (mTimer % 30 == 0) {
-			AngleMissile((int)m_x, (int)m_y + 100, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, (double)(5 + rand() % 4), 90 - 40, 80000, 0, rand() % 20 - 10);
-			AngleMissile((int)m_x, (int)m_y + 100, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, (double)(5 + rand() % 4), 90 + 40, 80000, 0, rand() % 20 - 10);
+		if (mTimer % (30+20-mGameInfo->GetLevel()*4) == 0) {
+			AngleMissile((int)m_x, (int)m_y, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, (double)(5 + rand() % 4), 90 - 60, 60000, 0, rand() % 20 - 10);
+			AngleMissile((int)m_x, (int)m_y, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, (double)(5 + rand() % 4), 90 + 60, 60000, 0, rand() % 20 - 10);
+			AngleMissile((int)m_x, (int)m_y, EB_KILLERSHOT_160x160, 4, KILLERSHOT_GRAVITY, (double)(5 + rand() % 4), 90 + 180, 60000, 0, rand() % 20 - 10);
 		}
 	}
-	else if (mTimer < 800) {
-		if (rand() % 9 == 0) {
+	else if (mTimer < 720) {
+		if (rand() % 18 == 0 && mCicleCounter==0) {
 			CCreateInfo info(300 + rand() % 360, rand() % 700, 0, 0, 0);
-			mEnemyManager->Create2(m_x, m_y, ENEMY_SPINNER3, 0, -5, info);
+			mEnemyManager->Create2(m_x, m_y, ENEMY_SPINNER4, 0, -5, info);
+		}
+	}
+	else if (mTimer<840){
+		if (mTimer%30==0) {
+			mSE->PlaySingleSound(SE_EXP5);
+			NormalShot((int)m_x, (int)m_y, EDAB_66, 0, 20 + mGameLevel * 3);
+			NormalShot((int)m_x, (int)m_y, EDAB_66, 0, 16 + mGameLevel * 3);
+			for (int i = 0; i<15; i++)AngleShot((int)m_x, (int)m_y, EB_26, 2, 5 + i + mGameLevel * 3, (int)ExMath::angleBetweenPoints((int)m_x, (int)m_y, mPlayer->GetX(), mPlayer->GetY()) + rand() % 10 - 5);
 		}
 	}
 	else {
 		mTimer = 120;
 		mCicleCounter++;
-		if (mCicleCounter == 2) {
+		if (mCicleCounter == 3) {
 			mLife = -1;
 		}
 	}

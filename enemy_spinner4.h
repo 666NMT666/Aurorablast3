@@ -8,6 +8,7 @@ public:
 void CEnemySpinner4::UpdateEnemy() {
 	CVector mTargetPos(mCreateInfo.params[0], mCreateInfo.params[1]);
 	mBltInfo.angle = 37 * mTimer;
+	BackLightLarge();
 	if (mTimer<2) { m_vx = 0; m_vy = 0; }
 	else if (mTimer<40) {
 		mCounter = 0;
@@ -20,7 +21,7 @@ void CEnemySpinner4::UpdateEnemy() {
 	}
 	if (mTimer>200) {
 		mCounter = 0;
-		m_vx = 10;
+		m_vy = 10;
 		if (mTimer >= 5)mBackEffectManager->CreateEffect((int)m_x, (int)m_y, EFFECT_BACKLIGHT1, 0, 0, 0, 0, 2, 0, 0);
 		return;
 	}

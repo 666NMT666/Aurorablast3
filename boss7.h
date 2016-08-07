@@ -3,7 +3,7 @@ private:
 	int mCicleCounter;
 public:
 	CBoss7():CBoss(){
-		mLife=64;
+		mLife=640;
 		mExLife=2;
 		mLife0=mLife;
 		mCicleCounter=0;
@@ -69,11 +69,32 @@ void CBoss7::Update1(){
 		if(m_y<150)m_y=150;
 	}
 	if(mTimer<50){
-
+		
 	}
 	else if(mTimer<100){
 		if(mTimer==85)mSE->PlaySingleSound(SE_CRY1);
-	}else{
+	}
+	else if (mTimer < 200) {
+		if (mTimer % 4 == 0) {
+			int i = (mTimer - 100) / 4;
+			AngleMissile(m_x, m_y, EB_MINE_30x30, 1, mGameInfo->GetLevel() * 4 + 14, -90 - i * 20);
+			AngleMissile(m_x, m_y, EB_MINE_30x30, 1, mGameInfo->GetLevel() * 4 + 12, -90 + i * 20);
+		}
+	}
+	else if(mTimer<300){
+		if (mTimer % 30 == 0) {
+			mSE->PlaySingleSound(SE_TND1);
+			if (mTimer % 60 == 0) {
+				AngleMissile(m_x, m_y, EB_SAW_137, 0, EMISSILE_HOCKEY, mGameInfo->GetLevel() * 3 + 30, 90 - 70, 0, 0, 0);
+				AngleMissile(m_x, m_y, EB_SAW_137, 0, EMISSILE_HOCKEY, mGameInfo->GetLevel() * 3 + 30, 90 - 70, 0, 0, 0);
+			}
+			else {
+				AngleMissile(m_x, m_y, EB_SAW_137, 0, EMISSILE_HOCKEY, mGameInfo->GetLevel() * 3 + 30, 90 + 70, 0, 0, 0);
+				AngleMissile(m_x, m_y, EB_SAW_137, 0, EMISSILE_HOCKEY, mGameInfo->GetLevel() * 3 + 30, 90 + 70, 0, 0, 0);
+			}
+		}
+	}
+	else {
 		mTimer=10;
 		mCicleCounter++;
 		if(mCicleCounter==2){

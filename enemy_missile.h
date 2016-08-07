@@ -26,6 +26,7 @@ enum TMissileFile {
 	EB_DEPTHCHARGE_48x30,
 	EB_DEPTHCHARGE_60x30,
 	KS_GRAVITY_100,
+	EB_SAW_137,
 
 	EMISSILE_FILES,
 };
@@ -43,6 +44,7 @@ const TEMissileFileData EMISSILE_FILE[EMISSILE_FILES]={
 	{"dat/img/eb/em-depthcharge48x30.bmp",48,30,4,BLT_KEY},
 	{ "dat/img/eb/em-depthcharge60x30.bmp",60,30,1,BLT_KEY },
 	{ "dat/img/eb/eb-killershot100.bmp",100,100,1,BLT_KEY },
+	{ "dat/img/eb/em-saw137.bmp",137,137,1,BLT_KEY },
 };
 
 class CEnemyMissile:public CEnemySideObject{
@@ -162,7 +164,7 @@ void CEnemyMissile::StopAndGo(){ //SPIN_GO
 		ForceFriction(0.82, 0.82);
 	}else if((mTimer<mParams[1]+2 || mCounter!=1) && mTimer<mParams[1]+30){
 		mLethalFlg=true;
-		if(abs_dx<100 && abs_dy<100 && mTimer>=mParams[1])mCounter=1;
+		if(abs_dx<100+(GAME_LEVEL_SUICIDAL-mGameInfo->GetLevel())*40 && abs_dy<100 + (GAME_LEVEL_SUICIDAL - mGameInfo->GetLevel()) * 40 && mTimer>=mParams[1])mCounter=1;
 		int angle=(int)ExMath::angleBetweenPoints((int)m_x,(int)m_y,mPlayer->GetX(),mPlayer->GetY());
 		SetVelPolar(mParams[2],angle);
 		mBltInfo.angle=180-angle;
@@ -490,6 +492,7 @@ void CEnemyMissile::Beam() {
 void CEnemyMissile::Hockey() {
 	mAutoDelFlg = true;
 	mLethalFlg = true;
+	mBltInfo.angle = rand()%360;
 	if (m_x <= BATTLE_LEFT || m_x >= BATTLE_RIGHT) {
 		m_vx *= -1;
 		mSE->PlaySingleSound(SE_EXP1);
@@ -499,6 +502,7 @@ void CEnemyMissile::Hockey() {
 void CEnemyMissile::HockeyY() {
 	mAutoDelFlg = true;
 	mLethalFlg = true;
+	mBltInfo.angle = rand() % 360;
 	if (m_y <= BATTLE_TOP || m_y >= BATTLE_BOTTOM) {
 		m_vy *= -1;
 		mSE->PlaySingleSound(SE_EXP1);

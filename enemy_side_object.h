@@ -51,8 +51,11 @@ public:
 	void BackLightLarge(int subKind=0){
 		mBackEffectManager->DrawEffect(m_bg,m_x,m_y,EFFECT_BACKLIGHT4,subKind,BLT_ADD,255);
 	}
-	void BackLightLarge(int x,int y,int subKind=0){
-		mBackEffectManager->DrawEffect(m_bg,x,y,EFFECT_BACKLIGHT4,subKind,BLT_ADD,255);
+	void BackLightLarge(int x, int y, int subKind = 0) {
+		mBackEffectManager->DrawEffect(m_bg, x, y, EFFECT_BACKLIGHT4, subKind, BLT_ADD, 255);
+	}
+	void BackLightLargeEx(int x, int y, int subKind = 0) {
+		mBackEffectManager->DrawEffect(m_bg, x, y, EFFECT_BACKLIGHT4, subKind, BLT_ADD, 255);
 	}
 
 	CVector GetVectorToPlayer(double amp) {

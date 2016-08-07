@@ -4,6 +4,15 @@ const int GAME_START_STAGE = 6;
 const int MAX_STAGES = 7;
 const int MAX_STAGE_TRIAL = 6;
 
+enum TGameLevel{
+	GAME_LEVEL_EASY,
+	GAME_LEVEL_NORMAL,
+	GAME_LEVEL_HARD,
+	GAME_LEVEL_MORBID,
+	GAME_LEVEL_SUICIDAL,
+	NUM_GAME_LEVEL,
+};
+
 class CGameInfo{
 private:
 	int mLevel,mMainWepon,mSubWepon,mUniqueWepon,mForm,mStage,mContinueCounter;

@@ -448,9 +448,7 @@ void CPlayer::Killed(){
 
 void CPlayer::ItemGet(int ext,int point){//現在ポイント（point）未使用
 
-	int bonus=(mGameInfo->GetStage()!=3 || mGameInfo->GetStage()!=6)?1:3;
 	mScore->AddItem();
-	mExtendCounter+=ext*bonus;
 	mFlgGotItem=true;
 
 	CBigInt bigInt(61+mScore->GetItems());
@@ -469,6 +467,8 @@ void CPlayer::ItemGet(int ext,int point){//現在ポイント（point）未使用
 	
 	mScore->AddScore(bigInt);
 
+	int bonus = (mGameInfo->GetStage() != 3) ? 1 : 3;
+	mExtendCounter += ext*bonus;
 	if(mExtendCounter>=MAX_EXTEND_COUNTER){
 		mSE->PlaySingleSound(SE_EXT1);
 		mLife++;
